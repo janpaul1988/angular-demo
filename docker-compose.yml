@@ -1,0 +1,23 @@
+version: '3'
+services:
+  mariadb:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=demo
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+  spring-boot-app:
+    build:
+      context: ./spring-boot-app
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"

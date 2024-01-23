@@ -1,0 +1,37 @@
+body {
+  background-color: #f4f1de; /* A parchment-like color for the background */
+  color: #3a5d25; /* A deep green color for the general text, reminiscent of the forests of Middle-Earth */
+  font-family: 'Cinzel', serif; /* A font that gives a feel of the Middle-Earth scripts */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #8b4513; /* A deep brown color for headings, like the wood of the Shire */
+}
+
+a {
+  color: #f4e542; /* A golden color for links, like the One Ring */
+}
+
+a:hover {
+  color: #3a5d25; /* Change the link color to deep green on hover */
+}
+
+button {
+  background-color: #3a5d25;
+  color: #f4e542;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+button:hover {
+  background-color: #f4e542;
+  color: #3a5d25;
+}

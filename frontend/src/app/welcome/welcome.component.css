@@ -1,0 +1,20 @@
+button {
+  background-color: #3a5d25; /* A deep green color, reminiscent of the forests of Middle-Earth */
+  color: #f4e542; /* A golden color, like the One Ring */
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 12px;
+  font-family: 'Cinzel', serif; /* A font that gives a feel of the Middle-Earth scripts */
+}
+
+button:hover {
+  background-color: #f4e542; /* Change the background to golden on hover */
+  color: #3a5d25; /* And the text to deep green */
+}

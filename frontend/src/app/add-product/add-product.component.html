@@ -1,0 +1,6 @@
+<form (ngSubmit)="addProduct()">
+  <input type="text" [(ngModel)]="product.name" name="name" placeholder="Name">
+  <input type="text" [(ngModel)]="product.description" name="description" placeholder="Description">
+  <input type="text" [(ngModel)]="product.extId" name="ext_id" placeholder="External ID">
+  <button type="submit">Add New Product</button>
+</form>

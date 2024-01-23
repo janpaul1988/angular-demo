@@ -1,0 +1,11 @@
+# Ignore intellij-IDE files.
+.idea/
+
+# Ignore angular-cli folders and build folders with generated files.
+node_modules/
+.angular/
+frontend/dist/
+
+# Ignore spring-boot app generated files.
+.gradle/
+spring-boot-app/build/

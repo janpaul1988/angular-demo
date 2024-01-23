@@ -1,0 +1,3 @@
+rootProject.name = 'angular-demo'
+include 'spring-boot-app'
+include 'frontend'

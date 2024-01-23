@@ -1,0 +1,10 @@
+<h1>Products</h1>
+<div *ngFor="let product of products">
+  <div style="display: flex; align-items: center;">
+    <div class="product-entity">{{ product.name }}</div>
+    <div class="product-entity">{{ product.description }}</div>
+    <div class="product-entity">{{ product.extId }}</div>
+    <button (click)="deleteProduct(product)">Delete</button>
+    <button (click)="updateProduct(product)">Update</button>
+  </div>
+</div>

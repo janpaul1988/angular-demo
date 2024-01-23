@@ -1,0 +1,20 @@
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    group 'com.example'
+    version '1.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
+
+subprojects {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
