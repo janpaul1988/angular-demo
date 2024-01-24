@@ -7,11 +7,11 @@ node_modules/
 frontend/dist/
 
 # Ignore spring-boot app generated files.
-.gradle/
 spring-boot-app/build/
+gen/
 
-# Ignore macOS system files
+# Ignore macOS system files.
 .DS_Store
 
-# Ignore spring boot generated files.
-gen/
+# Ignore gradle generated files.
+.gradle/
