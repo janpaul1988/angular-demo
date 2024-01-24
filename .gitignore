@@ -12,3 +12,6 @@ spring-boot-app/build/
 
 # Ignore macOS system files
 .DS_Store
+
+# Ignore spring boot generated files.
+gen/
