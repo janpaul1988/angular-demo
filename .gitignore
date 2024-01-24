@@ -9,3 +9,6 @@ frontend/dist/
 # Ignore spring-boot app generated files.
 .gradle/
 spring-boot-app/build/
+
+# Ignore macOS system files
+.DS_Store
