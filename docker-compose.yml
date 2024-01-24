@@ -11,8 +11,8 @@ services:
       - 3306:3306
   spring-boot-app:
     build:
-      context: ./spring-boot-app
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./spring-boot-app/Dockerfile
     ports:
       - 8080:8080
   frontend:
