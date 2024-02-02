@@ -10,8 +10,8 @@ COPY . .
 # Make sure the Gradle Wrapper script is executable
 RUN chmod +x ./gradlew
 
-# Build the project and skip tests, disable file system watching
-RUN ./gradlew :spring-boot-app:build -x test
+# Build the project and run tests, disable file system watching
+RUN ./gradlew :spring-boot-app:build
 
 # Use OpenJDK for base image
 FROM openjdk:17-jdk-slim
