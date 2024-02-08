@@ -75,11 +75,16 @@ class ProductRepositoryTest {
         // when the entity is updated
         var updatedProductName = "updatedtest";
         givenProduct.setName(updatedProductName);
-        productRepository.save(givenProduct);
+        assertThat(productRepository.updateProductById(givenProduct.getId(), givenProduct.getExtId(), givenProduct.getName(), givenProduct.getDescription())).isEqualTo(1);
+        entityManager.clear();
 
         // then the changes are persisted
         Product foundProduct = entityManager.find(Product.class, givenProduct.getId());
         assertThat(foundProduct.getName()).isEqualTo(updatedProductName);
+
+        // Delete the product and verify that updateProductById now returns 0.
+        productRepository.delete(foundProduct);
+        assertThat(productRepository.updateProductById(givenProduct.getId(), givenProduct.getExtId(), givenProduct.getName(), givenProduct.getDescription())).isEqualTo(0);
     }
 
 }

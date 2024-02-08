@@ -22,7 +22,7 @@ public class ProductController {
 
     @GetMapping
     public Iterable<Product> getAllProducts() {
-       return productRepository.findAll();
+        return productRepository.findAll();
     }
 
     @PostMapping
@@ -48,13 +48,7 @@ public class ProductController {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-        return productRepository.findById(id)
-                .map(product -> {
-                    product.setExtId(productUpdate.getExtId());
-                    product.setName(productUpdate.getName());
-                    product.setDescription(productUpdate.getDescription());
-                    return new ResponseEntity<>(productRepository.save(product), HttpStatus.OK);
-                })
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return productRepository.updateProductById(id, productUpdate.getExtId(), productUpdate.getName(), productUpdate.getDescription()) > 0
+                ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
