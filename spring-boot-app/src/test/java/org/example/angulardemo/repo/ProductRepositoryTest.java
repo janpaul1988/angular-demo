@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.TestPropertySource;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -49,11 +47,11 @@ class ProductRepositoryTest {
         entityManager.persistAndFlush(givenProduct);
 
         // when
-        productRepository.delete(givenProduct);
+        assertThat(productRepository.deleteProductById(givenProduct.getId())).isEqualTo(1);
+        entityManager.clear();
 
         // then
-        Product foundProduct = entityManager.find(Product.class, givenProduct.getId());
-        assertThat(foundProduct).isNull();
+        assertThat(productRepository.deleteProductById(givenProduct.getId())).isEqualTo(0);
     }
 
     @Test
