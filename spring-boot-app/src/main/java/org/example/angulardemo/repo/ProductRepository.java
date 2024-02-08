@@ -1,7 +1,16 @@
 package org.example.angulardemo.repo;
 
+import jakarta.transaction.Transactional;
 import org.example.angulardemo.entity.Product;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ProductRepository extends CrudRepository<Product, Long> {
+
+    @Transactional
+    @Modifying
+    @Query("delete from Product p where p.id = ?1")
+    int deleteProductById(Long id);
+
 }
