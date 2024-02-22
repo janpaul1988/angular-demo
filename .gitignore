@@ -15,3 +15,4 @@ gen/
 
 # Ignore gradle generated files.
 .gradle/
+.vscode/settings.json
