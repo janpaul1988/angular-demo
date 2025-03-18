@@ -1,6 +1,9 @@
 # Ignore intellij-IDE files.
 .idea/
 
+# Ignore vscode files.
+.vscode/
+
 # Ignore angular-cli folders and build folders with generated files.
 node_modules/
 .angular/
@@ -15,4 +18,3 @@ gen/
 
 # Ignore gradle generated files.
 .gradle/
-.vscode/settings.json
