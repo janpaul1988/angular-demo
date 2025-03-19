@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ProductComponent } from './product.component';
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 

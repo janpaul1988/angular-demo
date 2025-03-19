@@ -1,0 +1,11 @@
+angular
+.gradle
+build
+dist
+node_modules
+.git
+*.gradle
+.gitignore
+Dockerfile
+.dockerignore
+README.md

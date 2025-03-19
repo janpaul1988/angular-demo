@@ -18,8 +18,7 @@ export class UpdateProductComponent {
 
 
   constructor(private productService: ProductService, private router: Router) {
-    // @ts-ignore
-    this.product = router.getCurrentNavigation().extras.state.product;
+    this.product = router.getCurrentNavigation()?.extras?.state?.['product'];
   }
 
   updateProduct() {
