@@ -1,20 +1,22 @@
 # Ignore intellij-IDE files.
-.idea/
+.idea
 
 # Ignore vscode files.
-.vscode/
+.vscode
+
+# Ignore build folders
+build
 
 # Ignore angular-cli folders and build folders with generated files.
-node_modules/
-.angular/
-frontend/dist/
+node_modules
+.angular
+dist
 
 # Ignore spring-boot app generated files.
-spring-boot-app/build/
-gen/
+gen
 
 # Ignore macOS system files.
 .DS_Store
 
 # Ignore gradle generated files.
-.gradle/
+.gradle
