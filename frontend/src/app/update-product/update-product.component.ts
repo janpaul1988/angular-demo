@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ProductService} from "../product.service";
-import {NavigationStart, Router} from "@angular/router";
+import {Router} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {Product} from "../shared/product";
 

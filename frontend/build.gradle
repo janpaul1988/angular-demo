@@ -1,5 +1,7 @@
+import com.github.gradle.node.npm.task.NpmTask
+
 plugins {
-    id  'com.github.node-gradle.node' version '3.0.1'
+  id 'com.github.node-gradle.node' version '3.0.1'
 }
 
 repositories {
@@ -19,26 +21,26 @@ repositories {
 }
 
 node {
-    version = '22.14.0'
-    npmVersion = '10.9.2'
-    download = true
+  version = '22.14.0'
+  npmVersion = '10.9.2'
+  download = true
 }
 
-task installDependencies(type: com.github.gradle.node.npm.task.NpmTask) {
-    args = ['install']
+tasks.register('installDependencies', NpmTask) {
+  args = ['install']
 }
 
-task ngBuild(type: com.github.gradle.node.npm.task.NpmTask) {
-    dependsOn installDependencies
-    args = ['run', 'build']
+tasks.register('ngBuild', NpmTask) {
+  dependsOn installDependencies
+  args = ['run', 'build']
 }
 
-task ngTest(type: com.github.gradle.node.npm.task.NpmTask) {
+tasks.register('ngTest', NpmTask) {
   dependsOn installDependencies
   args = ['run', 'test', '--', '--watch=false']
 }
 
-task ngServe(type: com.github.gradle.node.npm.task.NpmTask) {
-    dependsOn installDependencies
-    args = ['run', 'start']
+tasks.register('ngServe', NpmTask) {
+  dependsOn installDependencies
+  args = ['run', 'start']
 }
