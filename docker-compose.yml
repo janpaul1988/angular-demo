@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   mariadb:
     image: mariadb
@@ -6,18 +6,33 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=demo
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
-    ports:
-      - 3306:3306
+      - mysql:/var/lib/mysql
+    networks:
+      - app_network
+
   spring-boot-app:
     build:
       context: .
       dockerfile: ./spring-boot-app/Dockerfile
-    ports:
-      - 8080:8080
+    depends_on:
+      - mariadb
+    networks:
+      - app_network
+    restart: on-failure
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    depends_on:
+      - spring-boot-app
     ports:
       - "80:80"
+    networks:
+      - app_network
+
+volumes:
+  mysql:
+
+networks:
+  app_network:
