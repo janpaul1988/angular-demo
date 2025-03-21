@@ -1,10 +1,11 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {UpdateProductComponent} from './update-product.component';
-import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {provideHttpClientTesting} from "@angular/common/http/testing";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ProductService} from "../product.service";
 import {Navigation, Router} from "@angular/router";
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 describe('UpdateProductComponent', () => {
   let component: UpdateProductComponent;
@@ -14,8 +15,8 @@ describe('UpdateProductComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UpdateProductComponent, HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      providers: [ProductService]
+      imports: [UpdateProductComponent, RouterTestingModule.withRoutes([])],
+      providers: [ProductService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
       .compileComponents();
 

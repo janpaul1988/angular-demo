@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {ProductService} from "../product.service";
 import {FormsModule} from "@angular/forms";
 import {Product} from "../shared/product";
 
 @Component({
   selector: 'app-add-product',
-  standalone: true,
   imports: [
     FormsModule
   ],

@@ -1,5 +1,5 @@
 # Use the official Gradle image to create a build artifact
-FROM gradle:7.2.0-jdk17 AS build
+FROM gradle:8.5-jdk21 AS build
 
 # Set the working directory
 WORKDIR /home/gradle/project
@@ -14,7 +14,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew :spring-boot-app:build
 
 # Use OpenJDK for base image
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 
 # Set the working directory
 WORKDIR /app

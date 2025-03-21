@@ -6,7 +6,6 @@ import {Product} from "../shared/product";
 
 @Component({
   selector: 'app-update-product',
-  standalone: true,
   imports: [
     FormsModule
   ],
