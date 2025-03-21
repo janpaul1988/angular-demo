@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: angular-demo
+
+  datasource:
+    driverClassName: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://mariadb:3306/demo
+    username: root
+    password: root
+
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+logging:
+  level:
+    org.example.angulardemo: DEBUG
