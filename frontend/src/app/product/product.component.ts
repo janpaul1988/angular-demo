@@ -1,13 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {ProductService} from "../product.service";
 import {NgForOf} from "@angular/common";
-import {NavigationExtras, Router} from "@angular/router";
+import {Router} from "@angular/router";
 import {Product} from "../shared/product";
-import {state} from "@angular/animations";
 
 @Component({
   selector: 'app-product',
-  standalone: true,
   imports: [
     NgForOf
   ],
