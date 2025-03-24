@@ -1,0 +1,17 @@
+
+### GET request to get all products
+GET http://localhost:8080/products
+
+
+### POST To create a product
+POST http://localhost:8080/products
+Content-Type: application/json
+
+{
+  "extId": "34",
+  "name": "bla",
+  "description": "blo"
+}
+
+
+
