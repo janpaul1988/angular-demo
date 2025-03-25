@@ -1,3 +1,19 @@
 <h1>Welcome to our site!</h1>
-<button routerLink="/products">Show Products</button>
-<button routerLink="/add-products">Add New Product</button>
+<div>
+    <div>
+        <button routerLink="/products">Show Products</button>
+    <button routerLink="/add-products">Add New Product</button>
+    </div>
+    <div>
+        <ng-container *ngIf="isAuthenticated; else loggedOut">
+            <button (click)="Auth.signOut()">Log out</button>
+            <button (click)="getUser()">user</button>
+          </ng-container>
+          
+          <ng-template #loggedOut>
+            <button (click)="Auth.signIn()">Log in</button>
+          </ng-template>
+    </div>
+</div>
+
+

@@ -1,14 +1,12 @@
 import {Component} from '@angular/core';
 import {ProductService} from "../product.service";
-import {Router} from "@angular/router";
-import {FormsModule} from "@angular/forms";
+import { FormsModule } from '@angular/forms';
 import {Product} from "../shared/product";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-update-product',
-  imports: [
-    FormsModule
-  ],
+  imports: [FormsModule],
   templateUrl: './update-product.component.html',
   styleUrl: './update-product.component.css'
 })

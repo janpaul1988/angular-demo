@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WelcomeComponent } from './welcome.component';
 import {ActivatedRoute} from "@angular/router";
-
 // @ts-ignore
 describe('WelcomeComponent', () => {
   let component: WelcomeComponent;
