@@ -1,10 +1,14 @@
 import {Component} from '@angular/core';
-import {RouterLink} from "@angular/router";
+import {AddProductComponent} from "../add-product/add-product.component";
+import {ProductComponent} from "../product/product.component";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-welcome',
   imports: [
-    RouterLink
+    AddProductComponent,
+    ProductComponent,
+    MatDivider
   ],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.css'

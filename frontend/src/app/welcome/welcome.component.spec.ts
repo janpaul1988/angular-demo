@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { WelcomeComponent } from './welcome.component';
-import {ActivatedRoute} from "@angular/router";
+import {WelcomeComponent} from './welcome.component';
+import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
 
 // @ts-ignore
 describe('WelcomeComponent', () => {
@@ -13,24 +13,7 @@ describe('WelcomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [WelcomeComponent],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            // Add any necessary properties for the ActivatedRoute stub here.
-            // For example, if your component uses ActivatedRoute.snapshot.params,
-            // you would add a snapshot property like this:
-            // snapshot: {
-            //   params: {
-            //     // params go here
-            //   }
-            // }
-            // If your component uses ActivatedRoute.params (an Observable),
-            // you would add a params property like this:
-            // params: of({
-            //   // params go here
-            // })
-          }
-        }
+        provideHttpClient(withInterceptorsFromDi())
       ]
     })
     .compileComponents();

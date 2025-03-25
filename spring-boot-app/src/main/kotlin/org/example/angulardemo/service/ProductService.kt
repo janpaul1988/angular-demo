@@ -24,7 +24,7 @@ class ProductService(
             .orElseThrow { ProductNotFoundException(productId) }
             .let {
                 it.name = productDTO.name
-                it.extId = productDTO.name
+                it.extId = productDTO.extId
                 it.description = productDTO.description
                 productRepository.save(it)
             }.toProductDTO()

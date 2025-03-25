@@ -22,7 +22,7 @@ class ProductController(
     fun getAllProducts(): List<ProductDTO> = productService.getAllProducts()
 
     @PutMapping("/{id}")
-    fun updateCourse(@PathVariable("id") productId: Long, @RequestBody productDTO: ProductDTO): ProductDTO =
+    fun updateProduct(@PathVariable("id") productId: Long, @RequestBody productDTO: ProductDTO): ProductDTO =
         productService.updateProduct(productId, productDTO)
 
     @DeleteMapping("/{id}")
