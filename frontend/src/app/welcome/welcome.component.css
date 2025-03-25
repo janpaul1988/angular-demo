@@ -1,20 +1,15 @@
-button {
-  background-color: #3a5d25; /* A deep green color, reminiscent of the forests of Middle-Earth */
-  color: #f4e542; /* A golden color, like the One Ring */
-  border: none;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  transition-duration: 0.4s;
-  cursor: pointer;
-  border-radius: 12px;
-  font-family: 'Cinzel', serif; /* A font that gives a feel of the Middle-Earth scripts */
+.product-container {
+  padding: 16px; /* Add basic padding */
+  margin: 10px; /* Add basic margin */
+  background-color: #f9f9f9; /* Optional: Add a subtle background color */
 }
 
-button:hover {
-  background-color: #f4e542; /* Change the background to golden on hover */
-  color: #3a5d25; /* And the text to deep green */
+.add-product-container {
+  padding: 16px; /* Add basic padding */
+  margin: 10px; /* Add basic margin */
+  text-align: left; /* Align content to the left */
+  font-size: 0.875rem; /* Make the text slightly smaller */
+  background-color: #f9f9f9; /* Optional: Add a subtle background color */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
 }

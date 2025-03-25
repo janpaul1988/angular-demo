@@ -1,6 +1,16 @@
-<form (ngSubmit)="addProduct()">
-  <input type="text" [(ngModel)]="product.name" name="name" placeholder="Name">
-  <input type="text" [(ngModel)]="product.description" name="description" placeholder="Description">
-  <input type="text" [(ngModel)]="product.extId" name="ext_id" placeholder="External ID">
-  <button type="submit">Add New Product</button>
+<form (ngSubmit)="addProduct()"
+      style="display: flex; flex-direction: column; gap: 16px; max-width: 400px; margin: auto;">
+  <mat-form-field appearance="fill">
+    <mat-label>Name</mat-label>
+    <input matInput type="text" [(ngModel)]="product.name" name="name" placeholder="Name">
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Description</mat-label>
+    <input matInput type="text" [(ngModel)]="product.description" name="description" placeholder="Description">
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>External Identifier</mat-label>
+    <input matInput type="text" [(ngModel)]="product.extId" name="ext_id" placeholder="External ID">
+  </mat-form-field>
+  <button mat-raised-button color="primary" type="submit" style="align-self: flex-end;">Add New Product</button>
 </form>

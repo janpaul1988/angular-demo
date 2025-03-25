@@ -1,39 +1,40 @@
 import {Component, OnInit} from '@angular/core';
 import {ProductService} from "../product.service";
-import {NgForOf} from "@angular/common";
 import {Router} from "@angular/router";
 import {Product} from "../shared/product";
+import {MatButton} from "@angular/material/button";
+import {MatList, MatListItem, MatListItemLine, MatListItemMeta, MatListItemTitle} from "@angular/material/list";
 
 @Component({
   selector: 'app-product',
   imports: [
-    NgForOf
+    MatButton,
+    MatList,
+    MatListItem,
+    MatListItemTitle,
+    MatListItemLine,
+    MatListItemMeta
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
 })
 export class ProductComponent implements OnInit {
-  products: Product [] = [];
+  products = this.productService.products;
 
   constructor(private productService: ProductService, private router: Router) {
   }
 
-  ngOnInit(): void {
-    this.productService.getProducts().subscribe(data => {
-      this.products = data;
-    });
-  }
-
   deleteProduct(productToDelete: Product) {
-    this.productService.deleteProduct(productToDelete).subscribe(response => {
-      console.log(response);
-      // remove the deleted product from the products array
-      this.products = this.products.filter(product => product.id !== productToDelete.id);
-    });
+    this.productService.deleteProduct(productToDelete)
   }
 
   updateProduct(productToUpdate: Product) {
     this.router.navigate(['/update-product'], {state: {product: productToUpdate}}).then(r => console.log(r));
   }
+
+  ngOnInit(): void {
+    this.productService.getProducts()
+  }
+
 
 }

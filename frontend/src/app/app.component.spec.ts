@@ -2,11 +2,16 @@ import {TestBed} from '@angular/core/testing';
 import {AppComponent} from './app.component';
 import {provideHttpClientTesting} from "@angular/common/http/testing";
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {ActivatedRoute} from "@angular/router";
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: {}
+        }]
     }).compileComponents();
   });
 

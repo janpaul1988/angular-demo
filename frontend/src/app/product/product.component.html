@@ -1,10 +1,14 @@
-<h1>Products</h1>
-<div *ngFor="let product of products">
-  <div style="display: flex; align-items: center;">
-    <div class="product-entity">{{ product.name }}</div>
-    <div class="product-entity">{{ product.description }}</div>
-    <div class="product-entity">{{ product.extId }}</div>
-    <button (click)="deleteProduct(product)">Delete</button>
-    <button (click)="updateProduct(product)">Update</button>
-  </div>
-</div>
+<h2>Products</h2>
+<mat-list>
+  @for (product of products(); track product.id) {
+    <mat-list-item>
+      <h4 matListItemTitle><span>{{ product.extId }}. </span><span>{{ product.name }}</span></h4>
+      <p matListItemLine>{{ product.description }}</p>
+      <p matListItemMeta>
+        <button mat-raised-button (click)="deleteProduct(product)">Delete</button>
+        <button mat-raised-button (click)="updateProduct(product)">Update</button>
+      </p>
+    </mat-list-item>
+  }
+</mat-list>
+
