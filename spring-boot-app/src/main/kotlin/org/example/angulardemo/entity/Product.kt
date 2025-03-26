@@ -10,8 +10,6 @@ data class Product(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(nullable = false)
-    var extId: String,
-    @Column(nullable = false)
     var name: String,
     var description: String? = null,
 ) {
@@ -19,7 +17,6 @@ data class Product(
     fun toProductDTO(): ProductDTO {
         return ProductDTO(
             id = this.id,
-            extId = this.extId,
             name = this.name,
             description = this.description
         )

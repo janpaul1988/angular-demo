@@ -1,0 +1,9 @@
+.update-product-container {
+  padding: 16px; /* Add basic padding */
+  margin: 10px; /* Add basic margin */
+  text-align: left; /* Align content to the left */
+  font-size: 0.875rem; /* Make the text slightly smaller */
+  /*background-color: #f9f9f9; !* Optional: Add a subtle background color *!*/
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
