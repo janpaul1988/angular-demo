@@ -1,16 +1,25 @@
-<form (ngSubmit)="updateProduct()">
-  <mat-form-field>
-    <mat-label>Name</mat-label>
-    <input matInput type="text" [(ngModel)]="product.name" name="name" placeholder="Name">
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Description</mat-label>
-    <input matInput type="text" [(ngModel)]="product.description" name="description" placeholder="Description">
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>External Identifier</mat-label>
-    <input matInput type="text" [(ngModel)]="product.extId" name="ext_id" placeholder="External ID">
-  </mat-form-field>
-  <button mat-raised-button type="submit">Update Product</button>
-</form>
-
+<div class="update-product-container">
+  <form #productForm="ngForm" (ngSubmit)="updateProduct()"
+        style="display: flex; flex-direction: column; gap: 16px; max-width: 400px; margin: auto;">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput type="text" [(ngModel)]="product.name" name="name" placeholder="Name" required #name="ngModel">
+      @if (name.invalid && name.touched) {
+        <mat-error>
+          @if (name.errors?.['required']) {
+            <span>Name is required.</span>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <input matInput type="text" [(ngModel)]="product.description" name="description" placeholder="Description">
+    </mat-form-field>
+    <button mat-raised-button type="submit" color="accent" style="align-self: flex-end;"
+            [disabled]="productForm.invalid">
+      <mat-icon>update</mat-icon>
+      Update Product
+    </button>
+  </form>
+</div>

@@ -21,9 +21,9 @@ export class ProductService {
   }
 
   addProduct(product: Product) {
-    this.http.post<Product>(this.apiUrl, product).pipe(
+    return this.http.post<Product>(this.apiUrl, product).pipe(
       tap(newProduct => this.products.update(products => [...products, newProduct]))
-    ).subscribe();
+    );
   }
 
   updateProduct(product: Product) {

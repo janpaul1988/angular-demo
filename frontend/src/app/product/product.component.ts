@@ -2,18 +2,20 @@ import {Component, OnInit} from '@angular/core';
 import {ProductService} from "../product.service";
 import {Router} from "@angular/router";
 import {Product} from "../shared/product";
-import {MatButton} from "@angular/material/button";
+import {MatIconButton} from "@angular/material/button";
 import {MatList, MatListItem, MatListItemLine, MatListItemMeta, MatListItemTitle} from "@angular/material/list";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: 'app-product',
   imports: [
-    MatButton,
     MatList,
     MatListItem,
     MatListItemTitle,
     MatListItemLine,
-    MatListItemMeta
+    MatListItemMeta,
+    MatIcon,
+    MatIconButton
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'

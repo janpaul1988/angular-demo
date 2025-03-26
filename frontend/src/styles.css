@@ -15,3 +15,13 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+.form-button {
+  padding: 0 14px;
+}
+
+mat-list-item {
+  background-color: var(--mat-background, #ffffff); /* Default to white */
+  color: var(--mat-on-background, #000000); /* Default to black */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12); /* Optional: Add a divider */
+}
