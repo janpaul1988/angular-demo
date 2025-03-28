@@ -1,6 +1,6 @@
-# Demo Project
+# Angular Demo Project
 
-Welcome to the **Demo Project**! This project serves as a reference implementation, showcasing the integration of modern
+Welcome to the **Angular Demo Project**! This project serves as a reference implementation, showcasing the integration of modern
 technologies to build a full-stack application. It is designed as a learning tool for developers to explore and
 understand the usage of these technologies.
 
