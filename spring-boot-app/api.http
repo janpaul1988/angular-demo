@@ -8,7 +8,6 @@ POST http://localhost:8080/products
 Content-Type: application/json
 
 {
-  "extId": "34",
   "name": "bla",
   "description": "blo"
 }

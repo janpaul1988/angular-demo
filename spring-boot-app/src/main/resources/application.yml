@@ -2,22 +2,18 @@ spring:
   application:
     name: angular-demo
 
-  datasource:
-    driverClassName: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://mariadb:3306/demo
-    username: root
+  r2dbc:
+    name: demo
     password: root
+    username: root
+    url: r2dbc:mariadb://mariadb:3306/demo
 
-  jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        jdbc:
-          lob:
-            non_contextual_creation: true
+  sql:
+    init:
+      mode: always # Always initialize the database on startup
+      schema-locations: classpath:schema.sql # Path to your schema file
+      data-locations: classpath:data.sql # Optional: Path to your data file
+
 logging:
   level:
     org.example.angulardemo: DEBUG

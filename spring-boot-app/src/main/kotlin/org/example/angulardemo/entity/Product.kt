@@ -1,15 +1,14 @@
 package org.example.angulardemo.entity
 
-import jakarta.persistence.*
 import org.example.angulardemo.dto.ProductDTO
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
 
-@Entity
+
 @Table(name = "product")
 data class Product(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    @Column(nullable = false)
     var name: String,
     var description: String? = null,
 ) {
