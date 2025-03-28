@@ -10,6 +10,7 @@ This project is built with the following technologies:
 
 ### Backend
 
+- **Kotlin**: A modern, concise, and expressive programming language that runs on the JVM and is fully interoperable with Java.
 - **Spring Boot**: A powerful framework for building Java-based microservices and RESTful APIs.
 - **R2DBC**: Reactive Relational Database Connectivity for non-blocking database access.
 - **MariaDB**: A fast, open-source relational database for storing application data.
@@ -40,7 +41,7 @@ This project is meant as:
 
 ## Features
 
-- **Reactive Backend**: Built with Spring Boot, WebFlux, and R2DBC for non-blocking, high-performance APIs.
+- **Reactive Backend**: Built with Kotlin, Spring Boot, WebFlux, and R2DBC for non-blocking, high-performance APIs.
 - **Modern Frontend**: Developed with Angular and Angular Material for a responsive and user-friendly interface.
 - **Database Integration**: Uses MariaDB for relational data storage with schema management.
 - **API Documentation**: Automatically generated OpenAPI documentation with Swagger UI.
