@@ -63,8 +63,8 @@ The entire application can be started to play around with by following these ste
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/demo-project.git
-   cd demo-project
+   git clone https://github.com/janpaul1988/angular-demo.git
+   cd angular-demo
    ```
 
 2. Start Docker and run the following command:
@@ -73,9 +73,7 @@ The entire application can be started to play around with by following these ste
    ```
 
 3. Access the application:
-    - **Frontend**: `http://localhost:4200`
-    - **Backend API**: `http://localhost:8080`
-    - **Swagger UI**: `http://localhost:8080/swagger-ui.html`
+    - **Frontend**: `http://localhost:80`
 
 ---
 
