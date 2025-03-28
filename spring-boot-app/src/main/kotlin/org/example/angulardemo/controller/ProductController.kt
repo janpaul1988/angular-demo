@@ -1,6 +1,7 @@
 package org.example.angulardemo.controller
 
 import jakarta.validation.Valid
+import kotlinx.coroutines.flow.Flow
 import org.example.angulardemo.dto.ProductDTO
 import org.example.angulardemo.service.ProductService
 import org.springframework.http.HttpStatus
@@ -16,17 +17,18 @@ class ProductController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun addProduct(@RequestBody @Valid productDTO: ProductDTO): ProductDTO = productService.addCourse(productDTO)
+    suspend fun addProduct(@RequestBody @Valid productDTO: ProductDTO): ProductDTO =
+        productService.addCourse(productDTO)
 
     @GetMapping
-    fun getAllProducts(): List<ProductDTO> = productService.getAllProducts()
+    suspend fun getAllProducts(): Flow<ProductDTO> = productService.getAllProducts()
 
     @PutMapping("/{id}")
-    fun updateProduct(@PathVariable("id") productId: Long, @RequestBody productDTO: ProductDTO): ProductDTO =
+    suspend fun updateProduct(@PathVariable("id") productId: Long, @RequestBody productDTO: ProductDTO): ProductDTO =
         productService.updateProduct(productId, productDTO)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteCourse(@PathVariable("id") productId: Long) = productService.deleteProduct(productId)
+    suspend fun deleteCourse(@PathVariable("id") productId: Long) = productService.deleteProduct(productId)
 
 }
