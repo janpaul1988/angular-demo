@@ -1,11 +1,13 @@
 services:
   mariadb:
     image: mariadb:11.7.2
+    container_name: mariadb
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=demo
     volumes:
       - mysql:/var/lib/mysql
+    # Uncomment these lines to communicate with the database separately
     #    ports:
     #      - "3306:3306"
     networks:
@@ -15,8 +17,12 @@ services:
     build:
       context: .
       dockerfile: ./spring-boot-app/Dockerfile
+    container_name: spring-boot-app
     depends_on:
       - mariadb
+    # Uncomment these lines to test the backend separately
+    #    ports:
+    #      - "8080:8080"
     networks:
       - app_network
     restart: on-failure
@@ -27,6 +33,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - spring-boot-app
+    # Normally, we only need to expose the frontend, since the nginx.conf routes to the backend via the app_network.
+    # This is preferable for safety concerns, i.e. reducing the attack surface.
     ports:
       - "80:80"
     networks:
