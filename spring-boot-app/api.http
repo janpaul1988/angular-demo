@@ -1,16 +1,30 @@
+# Spring Boot App
+@base_url = http://localhost:8080
+
+## Product API
+@products_url = {{base_url}}/products
 
 ### GET request to get all products
-GET http://localhost:8080/products
+GET {{products_url}}
 
-
-### POST To create a product
-POST http://localhost:8080/products
+### POST request to create a product
+POST {{products_url}}
 Content-Type: application/json
 
 {
-  "name": "bla",
-  "description": "blo"
+  "name": "test",
+  "description": "tester"
 }
 
+### PUT request to update a product
+PUT {{products_url}}/3
+Content-Type: application/json
 
+{
+  "name": "test",
+  "description": "tester"
+}
 
+### DELETE request to delete a product
+DELETE {{products_url}}/3
+Content-Type: application/json
