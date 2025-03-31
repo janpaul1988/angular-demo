@@ -20,20 +20,6 @@ This project is built with the following technologies:
 
 ---
 
-### Why This Update Works
-
-1. **Testcontainers Integration**:
-   - Highlights the use of Testcontainers for testing MariaDB and other components in isolation.
-   - Emphasizes the reliability and reproducibility of your integration tests.
-
-2. **Consistency with Features Section**:
-   - Aligns with the updated **Features** section, ensuring consistency in how technologies are described.
-
-3. **Focus on Testing**:
-   - Adds value by showcasing your robust testing practices, which are critical for modern backend development.
-
-Let me know if you’d like further refinements! 😊
-
 ### Frontend
 
 - **Angular**: A modern, TypeScript-based framework for building dynamic and responsive web applications.
