@@ -102,6 +102,8 @@ By exploring this project, you will learn:
 - How to create a **modern frontend** with Angular and Angular Material.
 - How to integrate a **relational database** (MariaDB) with a reactive backend.
 - How to use **Docker** and **Docker Compose** for containerized deployment.
+- How to use **Testcontainers** for reliable and isolated integration testing with MariaDB and other services.
+- How to write **integration tests** using Spring Boot Test, WebTestClient, and Testcontainers to ensure application reliability.
 - How to generate and use **API documentation** with SpringDoc OpenAPI.
 
 ---
