@@ -16,6 +16,23 @@ This project is built with the following technologies:
 - **MariaDB**: A fast, open-source relational database for storing application data.
 - **Spring WebFlux**: A reactive programming framework for building non-blocking REST APIs.
 - **SpringDoc OpenAPI**: Automatically generates API documentation and provides a Swagger UI for testing endpoints.
+- **Testcontainers**: Used for spinning up lightweight, disposable containers for integration testing, ensuring consistent and isolated test environments.
+
+---
+
+### Why This Update Works
+
+1. **Testcontainers Integration**:
+   - Highlights the use of Testcontainers for testing MariaDB and other components in isolation.
+   - Emphasizes the reliability and reproducibility of your integration tests.
+
+2. **Consistency with Features Section**:
+   - Aligns with the updated **Features** section, ensuring consistency in how technologies are described.
+
+3. **Focus on Testing**:
+   - Adds value by showcasing your robust testing practices, which are critical for modern backend development.
+
+Let me know if you’d like further refinements! 😊
 
 ### Frontend
 
@@ -46,6 +63,7 @@ This project is meant as:
 - **Database Integration**: Uses MariaDB for relational data storage with schema management.
 - **API Documentation**: Automatically generated OpenAPI documentation with Swagger UI.
 - **Containerized Deployment**: Easily deployable using Docker and Docker Compose.
+- **Integration Testing**: Comprehensive integration tests using **Spring Boot Test**, **WebTestClient**, and **Testcontainers** to ensure application reliability in real-world scenarios.
 
 ---
 
