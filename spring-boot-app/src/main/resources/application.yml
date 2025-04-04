@@ -11,8 +11,6 @@ spring:
   sql:
     init:
       mode: always # Always initialize the database on startup
-      schema-locations: classpath:schema.sql # Path to your schema file
-      data-locations: classpath:data.sql # Optional: Path to your data file
 
 logging:
   level:

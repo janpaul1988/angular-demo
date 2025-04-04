@@ -18,7 +18,7 @@ class ProductController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun addProduct(@RequestBody @Valid productDTO: ProductDTO): ProductDTO =
-        productService.addCourse(productDTO)
+        productService.addProduct(productDTO)
 
     @GetMapping
     suspend fun getAllProducts(): Flow<ProductDTO> = productService.getAllProducts()
