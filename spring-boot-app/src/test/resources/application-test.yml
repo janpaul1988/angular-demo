@@ -7,3 +7,6 @@ spring:
     init:
       mode: always # Always initialize the database on startup
 
+logging:
+  level:
+    org.example.angulardemo: DEBUG

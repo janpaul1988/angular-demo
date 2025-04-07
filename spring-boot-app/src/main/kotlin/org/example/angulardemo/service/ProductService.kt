@@ -27,24 +27,16 @@ class ProductService(
         }
 
     suspend fun updateProduct(productId: Long, product: ProductDTO): ProductDTO {
-        val productToUpdate = productRepository
-            .findById(productId) ?: throw ProductNotFoundException(productId)
-
-        return productToUpdate
-            .also {
-                it.name = product.name
-                it.description = product.description
-            }.let {
-                productRepository.save(it)
-            }.let {
-                productMapper.toDto(it)
-            }
+        doesProductExist(productId)
+        return addProduct(product)
     }
 
     suspend fun deleteProduct(productId: Long) {
-        val product = productRepository.findById(productId) ?: throw ProductNotFoundException(productId)
-        product.also {
-            productRepository.deleteById(productId)
-        }
+        doesProductExist(productId)
+        productRepository.deleteById(productId)
+    }
+
+    private suspend fun doesProductExist(productId: Long) {
+        productRepository.findById(productId) ?: throw ProductNotFoundException(productId)
     }
 }
