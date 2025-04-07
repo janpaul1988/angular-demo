@@ -24,7 +24,10 @@ class ProductController(
     suspend fun getAllProducts(): Flow<ProductDTO> = productService.getAllProducts()
 
     @PutMapping("/{id}")
-    suspend fun updateProduct(@PathVariable("id") productId: Long, @RequestBody productDTO: ProductDTO): ProductDTO =
+    suspend fun updateProduct(
+        @PathVariable("id") productId: Long,
+        @RequestBody @Valid productDTO: ProductDTO,
+    ): ProductDTO =
         productService.updateProduct(productId, productDTO)
 
     @DeleteMapping("/{id}")
