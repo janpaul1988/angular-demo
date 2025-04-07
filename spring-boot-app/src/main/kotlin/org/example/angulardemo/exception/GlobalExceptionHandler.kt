@@ -1,52 +1,38 @@
 package org.example.angulardemo.exception
 
-import org.springframework.http.HttpHeaders
+import org.example.angulardemo.logger
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Component
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.context.request.WebRequest
-import org.springframework.web.method.annotation.HandlerMethodValidationException
-import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler
-import org.springframework.web.server.ServerWebExchange
-import reactor.core.publisher.Mono
+import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.support.WebExchangeBindException
 
-@Component
-@ControllerAdvice
-class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
+@RestControllerAdvice
+class GlobalExceptionHandler {
 
-    override fun handleHandlerMethodValidationException(
-        ex: HandlerMethodValidationException,
-        headers: HttpHeaders,
-        status: HttpStatusCode,
-        exchange: ServerWebExchange,
-    ): Mono<ResponseEntity<Any>> {
-        val errors = ex.allErrors
+    @ExceptionHandler(ProductNotFoundException::class)
+    fun handleProductNotFoundException(ex: ProductNotFoundException): ResponseEntity<String> {
+        logger.error { ex.message }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.message)
+    }
+
+    @ExceptionHandler(WebExchangeBindException::class)
+    fun handleIllegalArgumentException(ex: WebExchangeBindException): ResponseEntity<String> {
+        val errors = ex.bindingResult.allErrors
             .map { error -> error.defaultMessage!! }
             .sorted()
 
-        logger.error("Method argument not valid observed: $errors", ex)
+        logger.error(ex) { "Method argument not valid observed: $errors" }
 
-        return Mono.just(
-            ResponseEntity
+        return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-                .body(errors.joinToString(", "))
-        )
-    }
-
-    @ExceptionHandler(ProductNotFoundException::class)
-    fun handleInstructorNotValidException(ex: ProductNotFoundException, request: WebRequest): ResponseEntity<Any> {
-        logger.error("Exception observed: ${ex.message}", ex)
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ex.message)
+            .body(errors.joinToString(", "))
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleAllExceptions(ex: Exception, request: WebRequest): ResponseEntity<Any> {
-        logger.error("Exception observed: ${ex.message}", ex)
+    fun handleGenericException(ex: Exception): ResponseEntity<String> {
+        logger.error(ex) { "${ex.message}" }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ex.message)
+            .body("An unexpected internal server error occurred. Please contact the system administrator.")
     }
 }

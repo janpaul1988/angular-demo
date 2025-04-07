@@ -20,3 +20,4 @@ gen
 
 # Ignore gradle generated files.
 .gradle
+bin

@@ -1,13 +1,8 @@
 spring:
-  application:
-    name: angular-demo
-
+  config:
+    import: optional:file:.env[.properties]
   r2dbc:
-    name: demo
-    password: root
-    username: root
-    url: r2dbc:mariadb://mariadb:3306/demo
-
+    url: r2dbc:tc:mariadb:///demo?TC_IMAGE_TAG=11.7.2
   sql:
     init:
       mode: always # Always initialize the database on startup
