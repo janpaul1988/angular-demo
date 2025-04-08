@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.test.web.reactive.server.WebTestClient
+import reactor.test.StepVerifier
 
 @WebFluxTest(controllers = [ProductController::class])
 @AutoConfigureWebTestClient
@@ -62,68 +63,84 @@ class ProductControllerUnitTest(
 
     @Test
     fun `should update product`() {
+
+        // Given
         val id = 1L
         val requestBody = ProductDTO(name = "testName", description = "testdescription")
         val resultBody = requestBody.copy(id = id)
 
         coEvery { productService.updateProduct(id, requestBody) } returns resultBody
 
-        val result = webTestClient.put()
+        // When
+        val response = webTestClient.put()
             .uri("/products/$id")
             .bodyValue(requestBody)
             .exchange()
             .expectStatus().isOk
-            .expectBody(ProductDTO::class.java)
-            .returnResult()
+            .returnResult(ProductDTO::class.java)
             .responseBody
 
+        // Then
         coVerify(exactly = 1) { productService.updateProduct(id, requestBody) }
-        Assertions.assertEquals(resultBody, result)
+
+        StepVerifier.create(response)
+            .expectNext(resultBody)
+            .verifyComplete()
+
+
     }
 
     @Test
     fun `should not update invalid product`() {
+        // Given
         val id = 1L
         val requestBody = ProductDTO(name = "", description = "testdescription")
 
-        val result = webTestClient.put()
+        // When
+        val response = webTestClient.put()
             .uri("/products/$id")
             .bodyValue(requestBody)
             .exchange()
             .expectStatus().isBadRequest
-            .expectBody(String::class.java)
-            .returnResult()
+            .returnResult(String::class.java)
             .responseBody
 
+        //Then
         coVerify { productService wasNot Called }
-        val expectedMessage = "Product name cannot be blank."
-        Assertions.assertEquals(expectedMessage, result)
+
+        StepVerifier.create(response)
+            .expectNext("Product name cannot be blank.")
+            .verifyComplete()
     }
 
     @Test
     fun `should not update non-existing product`() {
+        // Given
         val id = 1L
         val body = ProductDTO(name = "testName", description = "testdescription")
 
         coEvery { productService.updateProduct(id, body) } throws ProductNotFoundException(id)
 
-        val result = webTestClient.put()
+        // When
+        val response = webTestClient.put()
             .uri("/products/$id")
             .bodyValue(body)
             .exchange()
             .expectStatus().isNotFound
-            .expectBody(String::class.java)
-            .returnResult()
+            .returnResult(String::class.java)
             .responseBody
 
+        // Then
         coVerify(exactly = 1) { productService.updateProduct(id, body) }
-        val expectedMessage = "Product with id: $id not found"
-        Assertions.assertEquals(expectedMessage, result)
+
+        StepVerifier.create(response)
+            .expectNext("Product with id: $id not found")
+            .verifyComplete()
     }
 
     @Test
     fun `should retrieve all products successfully`() {
-
+        // Given
         val expectedProducts = listOf(
             ProductDTO(1, "testname1", "testdescription1"),
             ProductDTO(2, "testname2", "testdescription2")
@@ -138,13 +155,13 @@ class ProductControllerUnitTest(
             .expectStatus().isOk
             .returnResult(ProductDTO::class.java)
             .responseBody
-            .collectList()
-            .block()
 
+        // Then
         coVerify(exactly = 1) { productService.getAllProducts() }
 
-        // Then we  expect the result to match the saved products.
-        Assertions.assertEquals(expectedProducts, response)
+        StepVerifier.create(response)
+            .expectNextSequence(expectedProducts)
+            .verifyComplete()
     }
 
     @Test
