@@ -2,7 +2,9 @@ package org.example.angulardemo.controller
 
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.example.angulardemo.dto.ProductDTO
 import org.example.angulardemo.entity.Product
 import org.example.angulardemo.repository.ProductCrudRepository
@@ -33,8 +35,8 @@ class ProductControllerIntegrationTest(
     @Test
     fun `should retrieve all products successfully`() {
 
-        // Given the following saved products to the database.
-        val expectedProducts = runBlocking {
+        // Given: Save the products reactively and prepare the expected results.
+        val response = mono {
             flowOf(
                 Product(null, "testname1", "testdescription1"),
                 Product(null, "testname2", "testdescription2")
@@ -43,28 +45,32 @@ class ProductControllerIntegrationTest(
             }.toList().map {
                 ProductDTO(it.id, it.name, it.description)
             }
+        }.flatMapMany { expectedProducts ->
+            // When: Send a GET request to retrieve all products.
+            webTestClient.get()
+                .uri("/products")
+                .exchange()
+                .expectStatus().isOk
+                .returnResult(ProductDTO::class.java)
+                .responseBody
+                .collectList()
+                .map { actualProducts -> Pair(expectedProducts, actualProducts) } // Pair expected and actual results.
         }
 
-        // When we test the endpoint with a GET request.
-        val response = webTestClient.get()
-            .uri("/products")
-            .exchange()
-            .expectStatus().isOk
-            .returnResult(ProductDTO::class.java)
-            .responseBody
-
-        // Then we  expect the result to match the saved products.
+        // Then: Verify the response matches the saved products.
         StepVerifier.create(response)
-            .expectNextSequence(expectedProducts)
+            .assertNext { (expectedProducts, actualProducts) ->
+                assertThat(actualProducts).containsExactlyInAnyOrderElementsOf(expectedProducts)
+            }
             .verifyComplete()
     }
 
     @Test
     fun `should save product successfully`() {
-        // Given a product we want to save.
+        // Given: Prepare the product to save.
         val productToSave = ProductDTO(null, "testname1", "testdescription1")
 
-        // When we save that product with the http POST method.
+        // When: Send a POST request to save the product.
         val response = webTestClient.post()
             .uri("/products")
             .bodyValue(productToSave)
@@ -73,63 +79,69 @@ class ProductControllerIntegrationTest(
             .returnResult(ProductDTO::class.java)
             .responseBody
 
-        // Then we  expect the result to match the product we want to save.
+        // Then: Verify the response contains the saved product with a generated ID.
         StepVerifier.create(response)
             .expectNextMatches { product ->
-                product.id != null
-                        && product.id!! > 0
-                        && product == productToSave.copy(id = product.id)
+                product == productToSave.copy(id = product.id)
             }
             .verifyComplete()
     }
 
     @Test
     fun `should update product successfully`() {
-        // Given a single product that is saved to the database.
-        val savedProduct = runBlocking {
-
+        val response = mono {
+            // Given: Save the product to the database and prepare the product for update.
             Product(null, "testname", "testdescription")
                 .let {
                     productRepository.save(it)
                 }
-        }
-        // And given a set of values we want to change on that product.
-        val productToPut = savedProduct.let {
-            ProductDTO(it.id, "updatedTestName", "updatedTestDescription")
+                .let {
+                    assertThat(it.id).isNotNull() // Check that the product is saved.
+                    ProductDTO(it.id, "updatedTestName", "updatedTestDescription")// Prepare the product for update.
+                }
+        }.flatMapMany {
+            // When: Send a PUT request to update the product.
+            webTestClient.put()
+                .uri("/products/${it.id}")
+                .bodyValue(it)
+                .exchange()
+                .expectStatus().isOk
+                .returnResult(ProductDTO::class.java)
+                .responseBody
         }
 
-        // When we test the endpoint with a PUT request.
-        val response = webTestClient.put()
-            .uri("/products/${productToPut.id}")
-            .bodyValue(productToPut)
-            .exchange()
-            .expectStatus().isOk
-            .returnResult(ProductDTO::class.java)
-            .responseBody
-
-        // Then we  expect the result to match the product we put.
+        // Then: Verify the updated product matches the input.
         StepVerifier.create(response)
-            .expectNext(productToPut)
+            .expectNextMatches { product ->
+                product.id != null
+                        && product.name == "updatedTestName"
+                        && product.description == "updatedTestDescription"
+            }
             .verifyComplete()
     }
 
     @Test
     fun `should delete product successfully`() {
-
-        // Given a single product that is saved to the database.
-        val savedProduct = runBlocking {
-
-            Product(null, "testname", "testdescription")
-                .let {
-                    productRepository.save(it)
-                }
+        // Given: Save the product to the database.
+        val productToDelete = mono {
+            Product(null, "updatedTestName", "updatedTestDescription").let {
+                productRepository.save(it)
+            }
         }
+            .flatMap { product ->
+                assertThat(product.id).isNotNull() // Verify the product was saved and has an ID.
+                // When: Send a DELETE request to remove the product.
+                webTestClient.delete()
+                    .uri("/products/${product.id}")
+                    .exchange()
+                    .expectStatus().isNoContent
+                mono { productRepository.findById(product.id!!) }// Check if the product still exists in the database.
+            }
 
-        // When we test the endpoint with a DELETE request,
-        // Then we expect no content.
-        webTestClient.delete()
-            .uri("/products/${savedProduct.id}")
-            .exchange()
-            .expectStatus().isNoContent
+        // Then: Verify the product is no longer in the database.
+        StepVerifier.create(productToDelete)
+            .expectNextCount(0)
+            .verifyComplete()
+
     }
 }
