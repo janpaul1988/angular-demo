@@ -3,7 +3,6 @@ plugins {
     kotlin("plugin.spring") version "1.9.25"
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.jpa") version "1.9.25"
 }
 
 group = "org.example"
@@ -24,8 +23,9 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging:7.0.5")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.mockk:mockk:1.13.17")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 
@@ -35,7 +35,6 @@ dependencies {
     testImplementation("org.mariadb.jdbc:mariadb-java-client")
     testImplementation("org.testcontainers:r2dbc")
     testImplementation("org.testcontainers:mariadb")
-    testImplementation("io.projectreactor:reactor-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -54,12 +53,6 @@ kotlin {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-}
-
-tasks.processTestResources {
-    from("../../../../.env") {
-        into(".")
-    }
 }
 
 sourceSets {

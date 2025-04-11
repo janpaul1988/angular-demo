@@ -1,18 +1,18 @@
 package org.example.angulardemo.controller
 
 import com.ninjasquad.springmockk.MockkBean
-import io.mockk.*
+import io.mockk.Called
+import io.mockk.coEvery
+import io.mockk.coVerify
 import kotlinx.coroutines.flow.flowOf
 import org.example.angulardemo.dto.ProductDTO
 import org.example.angulardemo.exception.ProductNotFoundException
 import org.example.angulardemo.service.ProductService
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.test.StepVerifier
 
 @WebFluxTest(controllers = [ProductController::class])
 @AutoConfigureWebTestClient
@@ -25,192 +25,164 @@ class ProductControllerUnitTest(
 
     @Test
     fun `should add product`() {
-        val body = ProductDTO(name = "testname", description = "testdescription")
 
-        coEvery { productService.addProduct(any()) } returns body
-
-        val result = webTestClient.post()
-            .uri("/products")
-            .bodyValue(body)
-            .exchange()
-            .expectStatus().isCreated
-            .expectBody(ProductDTO::class.java)
-            .returnResult()
-            .responseBody
-
-        coVerify(exactly = 1) { productService.addProduct(body) }
-
-        Assertions.assertEquals(body, result)
+        ProductDTO(name = "testname", description = "testdescription")                         // Given
+            .also {
+                coEvery { productService.addProduct(any()) } returns it
+            }.also {
+                webTestClient.post()                                                           // When
+                    .uri("/products")
+                    .bodyValue(it)
+                    .exchange()
+                    .expectStatus().isCreated                                                  // Then
+                    .expectBody(ProductDTO::class.java)
+                    .isEqualTo(it)
+            }.also {
+                coVerify(exactly = 1) { productService.addProduct(it) }
+            }
     }
 
     @Test
     fun `should not add invalid product`() {
-        val body = ProductDTO(name = "", description = "testdescription")
-
-        val result = webTestClient.post()
-            .uri("/products")
-            .bodyValue(body)
-            .exchange()
-            .expectStatus().isBadRequest
-            .expectBody(String::class.java)
-            .returnResult()
-            .responseBody
-
-        coVerify { productService wasNot Called }
-        val expectedMessage = "Product name cannot be blank."
-        Assertions.assertEquals(expectedMessage, result)
+        ProductDTO(name = "", description = "testdescription")                         // Given
+            .also {
+                webTestClient.post()                                                   // When
+                    .uri("/products")
+                    .bodyValue(it)
+                    .exchange()
+                    .expectStatus().isBadRequest                                       // Then
+                    .expectBody(String::class.java)
+                    .isEqualTo("Product name cannot be blank.")
+            }.also {
+                coVerify { productService wasNot Called }
+            }
     }
 
     @Test
     fun `should update product`() {
 
-        // Given
-        val id = 1L
-        val requestBody = ProductDTO(name = "testName", description = "testdescription")
-        val resultBody = requestBody.copy(id = id)
-
-        coEvery { productService.updateProduct(id, requestBody) } returns resultBody
-
-        // When
-        val response = webTestClient.put()
-            .uri("/products/$id")
-            .bodyValue(requestBody)
-            .exchange()
-            .expectStatus().isOk
-            .returnResult(ProductDTO::class.java)
-            .responseBody
-
-        // Then
-        coVerify(exactly = 1) { productService.updateProduct(id, requestBody) }
-
-        StepVerifier.create(response)
-            .expectNext(resultBody)
-            .verifyComplete()
-
-
+        ProductDTO(1L, name = "testName", description = "testdescription")                          // Given
+            .let {
+                // Pair the request to its expected result.
+                it to it.copy(id = it.id, name = "updatedName", description = "updatedDescription")
+            }.also {
+                coEvery { productService.updateProduct(it.first.id!!, it.first) } returns it.second
+            }.also {                                                      // When
+                webTestClient.put()
+                    .uri("/products/${it.first.id}")
+                    .bodyValue(it.first)
+                    .exchange()
+                    .expectStatus().isOk                                                              // Then
+                    .expectBody(ProductDTO::class.java)
+                    .isEqualTo(it.second)
+            }.also {// Then
+                coVerify(exactly = 1) { productService.updateProduct(it.first.id!!, it.first) }
+            }
     }
 
     @Test
     fun `should not update invalid product`() {
-        // Given
-        val id = 1L
-        val requestBody = ProductDTO(name = "", description = "testdescription")
 
-        // When
-        val response = webTestClient.put()
-            .uri("/products/$id")
-            .bodyValue(requestBody)
-            .exchange()
-            .expectStatus().isBadRequest
-            .returnResult(String::class.java)
-            .responseBody
-
-        //Then
-        coVerify { productService wasNot Called }
-
-        StepVerifier.create(response)
-            .expectNext("Product name cannot be blank.")
-            .verifyComplete()
+        ProductDTO(1L, name = "", description = "testdescription")          // Given
+            .also {
+                webTestClient.put()                                             // When
+                    .uri("/products/${it.id}")
+                    .bodyValue(it)
+                    .exchange()
+                    .expectStatus().isBadRequest                                // Then
+                    .expectBody(String::class.java)
+                    .isEqualTo("Product name cannot be blank.")
+            }.also {
+                coVerify { productService wasNot Called }
+            }
     }
 
     @Test
     fun `should not update non-existing product`() {
-        // Given
-        val id = 1L
-        val body = ProductDTO(name = "testName", description = "testdescription")
 
-        coEvery { productService.updateProduct(id, body) } throws ProductNotFoundException(id)
-
-        // When
-        val response = webTestClient.put()
-            .uri("/products/$id")
-            .bodyValue(body)
-            .exchange()
-            .expectStatus().isNotFound
-            .returnResult(String::class.java)
-            .responseBody
-
-        // Then
-        coVerify(exactly = 1) { productService.updateProduct(id, body) }
-
-        StepVerifier.create(response)
-            .expectNext("Product with id: $id not found")
-            .verifyComplete()
+        ProductDTO(1L, name = "testName", description = "testdescription")            // Given
+            .also {
+                coEvery { productService.updateProduct(it.id!!, it) } throws ProductNotFoundException(it.id!!)
+            }
+            .also {
+                webTestClient.put()                                                      // When
+                    .uri("/products/${it.id}")
+                    .bodyValue(it)
+                    .exchange()
+                    .expectStatus().isNotFound                                          // Then
+                    .expectBody(String::class.java)
+                    .isEqualTo("Product with id: ${it.id} not found")
+            }
+            .also {
+                coVerify(exactly = 1) { productService.updateProduct(it.id!!, it) }
+            }
     }
 
     @Test
     fun `should retrieve all products successfully`() {
         // Given
-        val expectedProducts = listOf(
+        arrayOf(
             ProductDTO(1, "testname1", "testdescription1"),
             ProductDTO(2, "testname2", "testdescription2")
         )
-
-        coEvery { productService.getAllProducts() } returns flowOf(*expectedProducts.toTypedArray())
-
-        // When we test the endpoint with a GET request.
-        val response = webTestClient.get()
-            .uri("/products")
-            .exchange()
-            .expectStatus().isOk
-            .returnResult(ProductDTO::class.java)
-            .responseBody
-
-        // Then
-        coVerify(exactly = 1) { productService.getAllProducts() }
-
-        StepVerifier.create(response)
-            .expectNextSequence(expectedProducts)
-            .verifyComplete()
+            .also {
+                coEvery { productService.getAllProducts() } returns flowOf(*it)
+            }
+            .also {
+                webTestClient.get()
+                    .uri("/products")
+                    .exchange()
+                    .expectStatus().isOk
+                    .expectBodyList(ProductDTO::class.java)
+                    .contains(*it)
+            }
+            .also {
+                coVerify(exactly = 1) { productService.getAllProducts() }
+            }
     }
 
     @Test
     fun `should delete product`() {
-        val id = 1L
-        coEvery { productService.deleteProduct(id) } just runs
+        val id = 1L                                                 // Given
 
-        webTestClient.delete()
+        webTestClient.delete()                                      // When
             .uri("/products/$id")
             .exchange()
-            .expectStatus().isNoContent
+            .expectStatus().isNoContent                             // Then
 
         coVerify(exactly = 1) { productService.deleteProduct(id) }
     }
 
     @Test
     fun `should not delete non-existing product`() {
-        val id = 1L
+        val id = 1L                                                                                        // Given
+
         coEvery { productService.deleteProduct(id) } throws ProductNotFoundException(id)
 
-        val result = webTestClient.delete()
+        webTestClient.delete()                                                                             // When
             .uri("/products/$id")
             .exchange()
-            .expectStatus().isNotFound
+            .expectStatus().isNotFound                                                                     // Then
             .expectBody(String::class.java)
-            .returnResult()
-            .responseBody
+            .isEqualTo("Product with id: $id not found")
 
         coVerify(exactly = 1) { productService.deleteProduct(id) }
-        val expectedMessage = "Product with id: $id not found"
-        Assertions.assertEquals(expectedMessage, result)
+
     }
 
     @Test
     fun `should provide correct message on unexpected error`() {
-        val id = 1L
+        val id = 1L                                                                                             // Given
+
         coEvery { productService.deleteProduct(id) } throws Exception("Potentially sensitive system information")
 
-        val result = webTestClient.delete()
+        webTestClient.delete()                                                                                   // When
             .uri("/products/$id")
             .exchange()
-            .expectStatus().is5xxServerError
+            .expectStatus().is5xxServerError                                                                     // Then
             .expectBody(String::class.java)
-            .returnResult()
-            .responseBody
+            .isEqualTo("An unexpected internal server error occurred. Please contact the system administrator.")
 
         coVerify(exactly = 1) { productService.deleteProduct(id) }
-
-        val expectedMessage = "An unexpected internal server error occurred. Please contact the system administrator."
-        Assertions.assertEquals(expectedMessage, result)
     }
 }

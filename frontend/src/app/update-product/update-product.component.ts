@@ -31,9 +31,11 @@ export class UpdateProductComponent {
   }
 
   updateProduct() {
-    this.productService.updateProduct(this.product).subscribe(() => {
-      // Navigate only after the product is updated
-      this.router.navigate(['']);
-    });
+    this.productService
+      .updateProduct(this.product)
+      .subscribe(() => {
+        // Navigate only after the product is updated
+        this.router.navigate(['']);
+      });
   }
 }

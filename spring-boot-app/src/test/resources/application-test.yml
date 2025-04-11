@@ -1,6 +1,4 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
   r2dbc:
     url: r2dbc:tc:mariadb:///demo?TC_IMAGE_TAG=11.7.2
   sql:
