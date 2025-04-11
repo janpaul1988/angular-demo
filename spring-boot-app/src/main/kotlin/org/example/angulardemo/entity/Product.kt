@@ -10,7 +10,4 @@ data class Product(
     val id: Long? = null,
     var name: String,
     var description: String? = null,
-) {
-
-
-}
+)

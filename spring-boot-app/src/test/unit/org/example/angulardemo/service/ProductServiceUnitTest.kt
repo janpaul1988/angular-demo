@@ -6,7 +6,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.example.angulardemo.dto.ProductDTO
 import org.example.angulardemo.entity.Product
 import org.example.angulardemo.exception.ProductNotFoundException
@@ -28,7 +28,7 @@ class ProductServiceUnitTest(
 ) {
 
     @Test
-    fun `should add new product`() {
+    fun `should add new product`() = runTest {
         // Given
         val productDTO = mockk<ProductDTO>()
         val productEntity = mockk<Product>()
@@ -41,7 +41,7 @@ class ProductServiceUnitTest(
         every { productMapperMockk.toDto(savedProductEntity) } returns savedProductDTO
 
         // When
-        val result = runBlocking { productService.addProduct(productDTO) }
+        val result = productService.addProduct(productDTO)
 
         // Then
         coVerify(exactly = 1) { productMapperMockk.toEntity(productDTO) }
@@ -51,10 +51,10 @@ class ProductServiceUnitTest(
     }
 
     @Test
-    fun `should get all products`() {
+    fun `should get all products`() = runTest {
         // Given
         val productFlow = flowOf(mockk<Product>(), mockk<Product>())
-        val productList = runBlocking { productFlow.toList() }
+        val productList = productFlow.toList()
         val productDTOList = listOf(mockk<ProductDTO>(), mockk<ProductDTO>())
         every { productCrudRepositoryMockk.findAll() } returns productFlow
 
@@ -64,7 +64,7 @@ class ProductServiceUnitTest(
         }
 
         // When
-        val result = runBlocking { productService.getAllProducts().toList() }
+        val result = productService.getAllProducts().toList()
 
         // Then
         coVerify(exactly = 1) { productCrudRepositoryMockk.findAll() }
@@ -74,7 +74,7 @@ class ProductServiceUnitTest(
     }
 
     @Test
-    fun `should update product`() {
+    fun `should update product`() = runTest {
         val productId = 1L
         val productDTO = mockk<ProductDTO>()
         val productEntity = mockk<Product>()
@@ -87,7 +87,7 @@ class ProductServiceUnitTest(
         every { productMapperMockk.toDto(savedProductEntity) } returns savedProductDTO
 
         // When
-        val result = runBlocking { productService.updateProduct(1L, productDTO) }
+        val result = productService.updateProduct(1L, productDTO)
 
         // Then
         coVerify(exactly = 1) { productCrudRepositoryMockk.findById(productId) }
@@ -99,14 +99,14 @@ class ProductServiceUnitTest(
     }
 
     @Test
-    fun `update product that does not exist should throw`() {
+    fun `update product that does not exist should throw`() = runTest {
         // Given
         val productId = 1L
         coEvery { productCrudRepositoryMockk.findById(productId) } returns null
 
         // When
         assertFailsWith<ProductNotFoundException> {
-            runBlocking { productService.updateProduct(productId, mockk<ProductDTO>()) }
+            productService.updateProduct(productId, mockk<ProductDTO>())
         }
 
         // Then
@@ -116,14 +116,13 @@ class ProductServiceUnitTest(
     }
 
     @Test
-    fun `should delete product`() {
+    fun `should delete product`() = runTest {
         // Given
         val productId = 1L
         coEvery { productCrudRepositoryMockk.findById(productId) } returns mockk<Product>()
-        coEvery { productCrudRepositoryMockk.deleteById(productId) } just runs
 
         // When
-        runBlocking { productService.deleteProduct(1L) }
+        productService.deleteProduct(1L)
 
         // Then
         coVerify(exactly = 1) { productCrudRepositoryMockk.findById(productId) }
@@ -131,14 +130,14 @@ class ProductServiceUnitTest(
     }
 
     @Test
-    fun `delete product that does not exist should throw`() {
+    fun `delete product that does not exist should throw`() = runTest {
         // Given
         val productId = 1L
         coEvery { productCrudRepositoryMockk.findById(productId) } returns null
 
         // When
         assertFailsWith<ProductNotFoundException> {
-            runBlocking { productService.deleteProduct(1L) }
+            productService.deleteProduct(1L)
         }
 
         // Then

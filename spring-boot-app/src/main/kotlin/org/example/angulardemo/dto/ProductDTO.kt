@@ -7,8 +7,5 @@ data class ProductDTO(
     @get: NotBlank(message = "Product name cannot be blank.")
     var name: String,
     var description: String? = null,
-) {
-
-
-}
+)
 
