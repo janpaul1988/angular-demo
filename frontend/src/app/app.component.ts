@@ -12,5 +12,4 @@ import {MatIcon} from "@angular/material/icon";
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'demo';
 }
