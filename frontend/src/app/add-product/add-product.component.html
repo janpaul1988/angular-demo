@@ -6,7 +6,7 @@
     @if (name.invalid && name.touched) {
       <mat-error>
         @if (name.errors?.['required']) {
-          <span>Name is required.</span>
+          <span class="error-message">Name is required.</span>
         }
       </mat-error>
     }

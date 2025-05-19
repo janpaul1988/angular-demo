@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, output} from '@angular/core';
 import {ProductService} from "../product.service";
 import {FormsModule, NgForm} from "@angular/forms";
 import {Product} from "../shared/product";
@@ -23,7 +23,8 @@ import {MatIcon} from "@angular/material/icon";
 })
 export class AddProductComponent {
   product = new Product('', '');
-  @Output() productListUpdated = new EventEmitter<void>();
+  productListUpdated = output()
+
 
   constructor(private productService: ProductService) {
   }
