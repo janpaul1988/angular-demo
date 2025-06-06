@@ -14,4 +14,4 @@ spring:
 
 logging:
   level:
-    org.example.angulardemo: DEBUG
+    org.example.angulardemo: debug

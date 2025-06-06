@@ -15,23 +15,32 @@ class ProductController(
     val productService: ProductService,
 ) {
 
-    @PostMapping
+    @PostMapping("{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun addProduct(@RequestBody @Valid productDTO: ProductDTO): ProductDTO =
-        productService.addProduct(productDTO)
+    suspend fun addProduct(
+        @PathVariable("userId") userId: Long,
+        @RequestBody @Valid productDTO: ProductDTO,
+    ): ProductDTO =
+        productService.addProduct(userId, productDTO)
 
-    @GetMapping
-    suspend fun getAllProducts(): Flow<ProductDTO> = productService.getAllProducts()
+    @GetMapping("/{userId}")
+    suspend fun getAllProducts(
+        @PathVariable("userId") userId: Long,
+    ): Flow<ProductDTO> = productService.getAllProductsForUser(userId)
 
-    @PutMapping("/{id}")
+    @PutMapping("/{userId}/{id}")
     suspend fun updateProduct(
+        @PathVariable("userId") userId: Long,
         @PathVariable("id") productId: Long,
         @RequestBody @Valid productDTO: ProductDTO,
     ): ProductDTO =
-        productService.updateProduct(productId, productDTO)
+        productService.updateProduct(userId, productId, productDTO)
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{userId}/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    suspend fun deleteCourse(@PathVariable("id") productId: Long) = productService.deleteProduct(productId)
+    suspend fun deleteCourse(
+        @PathVariable("userId") userId: Long,
+        @PathVariable("id") productId: Long,
+    ) = productService.deleteProduct(userId, productId)
 
 }

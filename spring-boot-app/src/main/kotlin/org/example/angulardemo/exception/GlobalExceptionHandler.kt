@@ -1,17 +1,19 @@
 package org.example.angulardemo.exception
 
-import org.example.angulardemo.logger
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.bind.support.WebExchangeBindException
 
+private val logger = KotlinLogging.logger {}
+
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler(ProductNotFoundException::class)
-    fun handleProductNotFoundException(ex: ProductNotFoundException): ResponseEntity<String> {
+    @ExceptionHandler(ProductNotFoundException::class, UserNotFoundException::class)
+    fun handleProductNotFoundException(ex: RuntimeException): ResponseEntity<String> {
         logger.error { ex.message }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.message)
     }

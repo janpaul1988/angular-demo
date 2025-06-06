@@ -4,12 +4,11 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
 
-@Table(name = "product")
-data class Product(
+@Table(name = "user")
+data class User(
     @Id
-    val id: String?,
-    val userId: Long,
-    var externalId: Long?,
+    val id: Long? = null,
     var name: String,
-    var description: String?,
+    var email: String? = null,
 )
+

@@ -7,17 +7,20 @@ import org.springframework.stereotype.Component
 @Component
 class ProductMapper {
 
-    fun toEntity(product: ProductDTO): Product {
+    fun toEntity(productDto: ProductDTO): Product {
         return Product(
-            id = product.id,
-            name = product.name,
-            description = product.description
+            id = null,
+            userId = productDto.userId,
+            externalId = productDto.id,
+            name = productDto.name,
+            description = productDto.description
         )
     }
 
     fun toDto(product: Product): ProductDTO {
         return ProductDTO(
-            id = product.id,
+            id = product.externalId,
+            userId = product.userId,
             name = product.name,
             description = product.description
         )
