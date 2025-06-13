@@ -1,0 +1,22 @@
+<form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form" autocomplete="off"
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+  <mat-card style="width: 100%; max-width: 400px;">
+    <mat-card-content style="display: flex; flex-direction: column; gap: 20px;">
+      <mat-form-field appearance="fill">
+        <mat-label>Enter email to login</mat-label>
+        <input matInput type="email" [(ngModel)]="email" name="email" placeholder="email" required>
+      </mat-form-field>
+      <button mat-raised-button type="submit" color="accent" [disabled]="loginForm.invalid"
+              style="align-self: flex-end;">
+        <mat-icon>login</mat-icon>
+        Login
+      </button>
+      @if (errorMessage) {
+        <div style="color: red; margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+          <mat-icon color="warn" style="vertical-align: middle;">error</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</form>
