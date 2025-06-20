@@ -10,7 +10,6 @@ class UserMapper {
     fun toEntity(user: UserDTO): User {
         return User(
             id = user.id,
-            name = user.name,
             email = user.email
         )
     }
@@ -18,7 +17,6 @@ class UserMapper {
     fun toDto(user: User): UserDTO {
         return UserDTO(
             id = user.id,
-            name = user.name,
             email = user.email
         )
     }

@@ -21,3 +21,6 @@ gen
 # Ignore gradle generated files.
 .gradle
 bin
+
+# Ignore secrets
+.env

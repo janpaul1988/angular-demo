@@ -1,55 +1,60 @@
 import {TestBed} from '@angular/core/testing';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {ProductService} from './product.service';
 import {provideHttpClient} from '@angular/common/http';
 import {AuthService} from "./auth.service";
-import {UserService} from "./user.service";
-import {of} from "rxjs";
-import {User} from "../shared/user";
+import {RedirectService} from "./redirect.service";
 
 describe('AuthService', () => {
-  let authService: AuthService;
-  let userServiceSpy;
-  let testUser: User;
+  let
+    authService: AuthService,
+    redirectServiceSpy: jasmine.Spy,
+    httpTestController: HttpTestingController;
 
 
   beforeEach(() => {
-    testUser = {id: 1, name: 'Tester', email: 'test@test.com'};
-    userServiceSpy = jasmine.createSpyObj('UserService', ['getUser']);
-    userServiceSpy.getUser.and.returnValue(of(testUser));
-
+    redirectServiceSpy = jasmine.createSpy('redirect');
     TestBed.configureTestingModule({
-      providers: [ProductService,
+      providers: [
+        ProductService,
         provideHttpClient(),
         provideHttpClientTesting(),
-        {provide: UserService, useValue: userServiceSpy}]
+        {provide: RedirectService, useValue: {redirect: redirectServiceSpy}}
+      ]
     });
     authService = TestBed.inject(AuthService);
+    httpTestController = TestBed.inject(HttpTestingController);
   });
 
-  it('Should login: get the userdata and consequently correctly set the login and user state.', () => {
+  it('should return true if health endpoint returns 200', (done) => {
+    authService.isAuthenticated().subscribe(result => {
+      expect(result).toBeTrue();
+      done();
+    });
 
-    authService.login(testUser.email).subscribe(user => {
-        expect(user).toEqual(testUser)
-      }
-    );
-    expect(authService.userData()).withContext('userdata not correctly set').toBe(testUser)
-    expect(authService.isLoggedIn()).withContext('Not logged in').toBe(true)
-  })
+    const req = httpTestController.expectOne('api/actuator/health');
+    expect(req.request.method).toBe('GET');
+    req.flush({}); // Simulate a successful response
+  });
 
-  it('Should logout: reset the userdata and login state to false after logging in.', () => {
-    // Login to recognize state of login first.
-    authService.login(testUser.email).subscribe(user => {
-        expect(user).toEqual(testUser)
-      }
-    );
-    expect(authService.userData()).withContext('userdata not correctly set').toBe(testUser)
-    expect(authService.isLoggedIn()).withContext('Not logged in').toBe(true)
+  it('should return false if health endpoint errors', (done) => {
+    authService.isAuthenticated().subscribe(result => {
+      expect(result).toBeFalse();
+      done();
+    });
 
-    // Logout as well.
+    const req = httpTestController.expectOne('api/actuator/health');
+    expect(req.request.method).toBe('GET');
+    req.flush({message: 'Network error'}, {status: 500, statusText: 'Server Error'});
+  });
+
+  it('should logout and redirect to the correct logout url', () => {
     authService.logout();
-    expect(authService.userData()).withContext('userdata not correctly reset').toBe(undefined)
-    expect(authService.isLoggedIn()).withContext('Not logged in').toBe(false)
-  })
+    expect(redirectServiceSpy).toHaveBeenCalledWith('/oauth2/sign_out?rd=/');
+  });
+
+  afterEach(() => {
+    httpTestController.verify();
+  });
 
 });

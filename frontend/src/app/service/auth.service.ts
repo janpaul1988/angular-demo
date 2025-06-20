@@ -1,31 +1,24 @@
-import {Injectable, signal} from '@angular/core';
-import {User} from "../shared/user";
-import {UserService} from "./user.service";
-import {tap} from "rxjs";
+import {Injectable} from '@angular/core';
+import {catchError, map, Observable, of} from "rxjs";
+import {HttpClient} from "@angular/common/http";
+import {RedirectService} from "./redirect.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  userData = signal<User | undefined>(undefined)
-
-  isLoggedIn = signal<boolean>(false);
-
-  constructor(private userService: UserService) {
+  constructor(private http: HttpClient, private redirectService: RedirectService) {
   }
 
-  login(email: string) {
-    return this.userService.getUser(email).pipe(
-      tap(user => {
-        this.isLoggedIn.set(true);
-        this.userData.set(user);
-      })
+  isAuthenticated(): Observable<boolean> {
+    return this.http.get('api/actuator/health').pipe(
+      map(() => true),
+      catchError(() => of(false))
     );
   }
 
   logout() {
-    this.isLoggedIn.set(false);
-    this.userData.set(undefined);
+    this.redirectService.redirect('/oauth2/sign_out?rd=/');
   }
 }

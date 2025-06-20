@@ -1,16 +1,19 @@
-import {CanActivateFn, Router} from '@angular/router';
-import {inject} from "@angular/core";
-import {AuthService} from "../service/auth.service";
-
+import {CanActivateFn} from '@angular/router';
+import {AuthService} from '../service/auth.service';
+import {inject} from '@angular/core';
+import {map, tap} from "rxjs";
+import {RedirectService} from "../service/redirect.service";
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const auth = inject(AuthService);
-  const router = inject(Router);
+  const authService = inject(AuthService);
+  const redirectService = inject(RedirectService);
 
-  if (auth.isLoggedIn()) {
-    return true;
-  } else {
-    router.navigate(['/login']);
-    return false;
-  }
+  return authService.isAuthenticated().pipe(
+    tap(authenticated => {
+      if (!authenticated) {
+        redirectService.redirect(`/oauth2/sign_in?rd=${encodeURIComponent(state.url)}`);
+      }
+    }),
+    map(authenticated => authenticated)
+  );
 };

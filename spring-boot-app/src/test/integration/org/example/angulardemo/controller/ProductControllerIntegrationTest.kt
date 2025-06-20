@@ -40,7 +40,7 @@ class ProductControllerIntegrationTest(
         // Given an empty products table in the database.
         productRepository.deleteAll()
         userCrudRepository.deleteAll()
-        userId = userCrudRepository.save(User(null, "testuser", "testemail")).id!!
+        userId = userCrudRepository.save(User(null, "testuser")).id!!
     }
 
     @Test

@@ -1,7 +1,7 @@
 package org.example.angulardemo.service
 
 import org.example.angulardemo.dto.UserDTO
-import org.example.angulardemo.exception.UserNotFoundException
+import org.example.angulardemo.entity.User
 import org.example.angulardemo.mapper.UserMapper
 import org.example.angulardemo.repository.UserCrudRepository
 import org.springframework.stereotype.Service
@@ -14,7 +14,11 @@ class UserService(
 
     suspend fun getUserByEmail(email: String): UserDTO {
         return userRepository.findByEmail(email)?.let { userMapper.toDto(it) }
-            ?: throw UserNotFoundException(email)
+            ?: userMapper.toDto(addUserByEmail(email))
+    }
+
+    private suspend fun addUserByEmail(email: String): User {
+        return userRepository.save(User(null, email))
     }
 
 

@@ -7,13 +7,11 @@ import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.test.runTest
 import org.example.angulardemo.dto.UserDTO
 import org.example.angulardemo.entity.User
-import org.example.angulardemo.exception.UserNotFoundException
 import org.example.angulardemo.mapper.UserMapper
 import org.example.angulardemo.repository.UserCrudRepository
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 @ExtendWith(MockKExtension::class)
 class UserServiceUnitTest(
@@ -46,18 +44,26 @@ class UserServiceUnitTest(
     }
 
     @Test
-    fun `should throw if the user for a given email does not exist`() = runTest {
+    fun `should create a new user if the user for a given email does not exist`() = runTest {
         // Given
+        val userDTO = mockk<UserDTO>()
+        val user = mockk<User>()
         val email = "tester@tester.com"
+        val userToSave = User(null, email)
 
         coEvery { userCrudRepositoryMockk.findByEmail(email) } returns null
+        coEvery { userCrudRepositoryMockk.save(userToSave) } returns user
+        every { userMapperMockk.toDto(user) } returns userDTO
 
         // When
-        assertFailsWith<UserNotFoundException> { userService.getUserByEmail(email) }
+        val result = userService.getUserByEmail(email)
 
         // Then
         coVerify(exactly = 1) { userCrudRepositoryMockk.findByEmail(email) }
-        verify { userMapperMockk wasNot called }
+        coVerify(exactly = 1) { userCrudRepositoryMockk.save(userToSave) }
+        verify(exactly = 1) { userMapperMockk.toDto(user) }
+
+        assertEquals(userDTO, result)
     }
 
 }

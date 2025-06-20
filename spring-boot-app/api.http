@@ -37,4 +37,11 @@ Content-Type: application/json
 ## User API
 
 ### GET request to get user by email
-GET {{users_url}}?email=test@test.com
+GET {{users_url}}
+X-Forwarded-Email: jp_brasser@hotmail.com
+
+### get it
+GET localhost:9000/api/products/1
+
+### delete some?
+DELETE localhost:9000/api/products/1/1
