@@ -4,7 +4,6 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
 import io.mockk.coVerify
 import org.example.angulardemo.dto.UserDTO
-import org.example.angulardemo.exception.UserNotFoundException
 import org.example.angulardemo.service.UserService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,50 +22,22 @@ class UserControllerUnitTest(
 
 
     @Test
-    fun `should find an existing user by email`() {
+    fun `should find an existing user by email or create it if it does not exist`() {
 
         // Given
-        val result = UserDTO(1L, name = "testName", email = "test@tester.com")
+        val result = UserDTO(1L, email = "test@tester.com")
         coEvery { userService.getUserByEmail(result.email!!) } returns result
 
         // When
         webTestClient.get()
-            .uri { uriBuilder ->
-                uriBuilder.path("/users")
-                    .queryParam("email", result.email)
-                    .build()
-            }
+            .uri("/users")
+            .header("X-Forwarded-Email", result.email)
             .exchange()
 
             // Then
             .expectStatus().isOk
             .expectBody(UserDTO::class.java)
             .isEqualTo(result)
-
-        coVerify(exactly = 1) { userService.getUserByEmail(result.email!!) }
-
-    }
-
-    @Test
-    fun `should throw if there is no existing user for a certain email`() {
-
-        // Given
-        val result = UserDTO(1L, name = "testName", email = "test@tester.com")
-        coEvery { userService.getUserByEmail(result.email!!) } throws UserNotFoundException(result.email!!)
-
-        // When
-        webTestClient.get()
-            .uri { uriBuilder ->
-                uriBuilder.path("/users")
-                    .queryParam("email", result.email)
-                    .build()
-            }
-            .exchange()
-
-            // Then
-            .expectStatus().isNotFound
-            .expectBody(String::class.java)
-            .isEqualTo("No user registered with email: ${result.email}.")
 
         coVerify(exactly = 1) { userService.getUserByEmail(result.email!!) }
 

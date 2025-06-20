@@ -1,5 +1,5 @@
 import {Component, output} from '@angular/core';
-import {ProductService} from "../product.service";
+import {ProductService} from "../service/product.service";
 import {FormsModule, NgForm} from "@angular/forms";
 import {Product} from "../shared/product";
 import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
@@ -24,7 +24,6 @@ import {MatIcon} from "@angular/material/icon";
 export class AddProductComponent {
   product = new Product('', '');
   productListUpdated = output()
-
 
   constructor(private productService: ProductService) {
   }

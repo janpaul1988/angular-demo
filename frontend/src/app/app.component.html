@@ -15,6 +15,11 @@
     Home
   </button>
   <h1 class="app-title">Angular Demo</h1>
+  <h1 class="welcome-message">Welcome {{ userData()?.email }}</h1>
+  <button mat-raised-button (click)="logOut()" color="accent">
+    <mat-icon>logout</mat-icon>
+    Logout
+  </button>
 </mat-toolbar>
 <router-outlet></router-outlet>
 </body>

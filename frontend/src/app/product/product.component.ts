@@ -1,5 +1,5 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ProductService} from "../product.service";
+import {Component, OnDestroy} from '@angular/core';
+import {ProductService} from "../service/product.service";
 import {Router} from "@angular/router";
 import {Product} from "../shared/product";
 import {MatIconButton} from "@angular/material/button";
@@ -21,15 +21,11 @@ import {Subscription} from "rxjs";
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
 })
-export class ProductComponent implements OnInit, OnDestroy {
+export class ProductComponent implements OnDestroy {
 
-  products = this.productService.products;
+  products = this.productService.products.value;
 
   private subscription?: Subscription;
-
-  ngOnInit(): void {
-    this.subscription = this.productService.getProducts().subscribe();
-  }
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
@@ -39,7 +35,8 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   deleteProduct(productToDelete: Product) {
-    this.productService.deleteProduct(productToDelete).subscribe();
+    this.productService.deleteProduct(productToDelete)
+      .subscribe();
   }
 
   updateProduct(productToUpdate: Product) {

@@ -20,6 +20,38 @@ This project is built with the following technologies:
 
 ---
 
+### BFF
+
+BFF (Backend For Frontend) & OAuth2 Authentication
+This project includes a BFF (Backend For Frontend) service that acts as a secure gateway between the Angular frontend
+and the backend API. The BFF handles OAuth2 authentication (e.g., with Google/Gmail) and ensures that only authenticated
+users can access protected resources.
+
+#### How it works
+
+* The Angular frontend sends API requests to the BFF, not directly to the backend.
+* The BFF checks for a valid OAuth2 token on each request.
+* If no valid token is present, the BFF redirects the user to the OAuth2 provider’s login page.
+* After successful authentication, the BFF receives the token, manages the session, and proxies requests to the backend
+  with the appropriate credentials.
+* The backend uses the token data (e.g., email) to identify or provision users as needed.
+
+#### Configuring OAuth2
+
+To use OAuth2 authentication (e.g., with Google), you must register your application with your OAuth provider and obtain
+a client ID and client secret.
+
+1. Register your app with your OAuth provider (e.g., Google Cloud Console).
+2. Create a .env file in the root of the repository (next to docker-compose.yml) with the following content:
+
+Replace the values with your actual credentials.
+You can generate a random cookie secret with:
+`openssl rand -base64 32`
+Do NOT commit your .env file to version control.
+Make sure .env is listed in your .gitignore.
+
+The Docker Compose setup will automatically use these values to configure the BFF for OAuth2 authentication.
+
 ### Frontend
 
 - **Angular**: A modern, TypeScript-based framework for building dynamic and responsive web applications.
