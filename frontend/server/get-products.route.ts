@@ -1,8 +1,7 @@
-import {Request, Response} from 'express';
 import {deleteTestProduct, findProducts, saveProduct, updateTestProduct} from './db-data';
 
-
-export function addProduct(req: Request, res: Response) {
+//@ts-ignore
+export function addProduct(req, res) {
 
   const userId = req.params["userId"],
     product = req.body;
@@ -15,7 +14,8 @@ export function addProduct(req: Request, res: Response) {
 
 }
 
-export function updateProduct(req: Request, res: Response) {
+//@ts-ignore
+export function updateProduct(req, res) {
 
   const userId = req.params["userId"],
     id = req.params["id"],
@@ -29,7 +29,8 @@ export function updateProduct(req: Request, res: Response) {
 
 }
 
-export function getProducts(req: Request, res: Response) {
+//@ts-ignore
+export function getProducts(req, res) {
 
   const userId = req.params["userId"];
 
@@ -40,7 +41,8 @@ export function getProducts(req: Request, res: Response) {
   res.status(200).json(courses);
 }
 
-export function deleteProduct(req: Request, res: Response) {
+//@ts-ignore
+export function deleteProduct(req, res) {
   console.log("in delete!")
   const userId = req.params["userId"];
   const id = req.params["id"];
