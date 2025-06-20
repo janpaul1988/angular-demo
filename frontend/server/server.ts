@@ -1,12 +1,9 @@
-import {Application} from "express";
 import {getUser} from "./get-user.route";
 import {addProduct, deleteProduct, getProducts, updateProduct} from './get-products.route';
 
 const express = require('express')
+const app = express();
 const bodyParser = require('body-parser');
-
-const app: Application = express();
-
 const cors = require('cors');
 
 app.use(cors({origin: true}));
