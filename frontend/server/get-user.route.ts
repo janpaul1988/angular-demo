@@ -1,9 +1,9 @@
 import {getTestUser} from "./db-data";
+import {Request, Response} from "express"
 
-// @ts-ignore
-export function getUser(req, res) {
+export function getUser(req: Request, res: Response) {
   const user = getTestUser();
-  return res.status(200).json(user);
+  res.status(200).json(user);
 }
 
 
