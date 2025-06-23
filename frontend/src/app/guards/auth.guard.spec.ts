@@ -3,7 +3,6 @@ import {ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 import {lastValueFrom, of} from 'rxjs';
 import {authGuard} from './auth.guard';
 import {AuthService} from '../service/auth.service';
-import {runInInjectionContext} from '@angular/core';
 import {RedirectService} from "../service/redirect.service";
 
 describe('authGuard', () => {
@@ -26,7 +25,7 @@ describe('authGuard', () => {
   it('should return true if authenticated', async () => {
     mockAuthService.isAuthenticated.and.returnValue(of(true));
 
-    const result = runInInjectionContext(TestBed, () =>
+    const result = TestBed.runInInjectionContext(() =>
       authGuard(mockRoute, mockState)
     );
 
@@ -40,9 +39,10 @@ describe('authGuard', () => {
   it('should return false if not authenticated and redirect to the correct login url', async () => {
     mockAuthService.isAuthenticated.and.returnValue(of(false));
 
-    const result = runInInjectionContext(TestBed, () =>
+    const result = TestBed.runInInjectionContext(() =>
       authGuard(mockRoute, mockState)
     );
+
 
     const value = result && typeof result === 'object' && 'subscribe' in result
       ? await lastValueFrom(result)
