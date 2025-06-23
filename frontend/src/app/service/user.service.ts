@@ -7,12 +7,6 @@ import {User} from "../shared/user";
 export class UserService {
   private apiUrl = '/api/users';
 
-  user = httpResource<User>(
-    {
-      url: this.apiUrl,
-      method: 'GET'
-    }
-  )
-
+  user = httpResource<User>(() => this.apiUrl);
 
 }

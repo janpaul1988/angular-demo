@@ -1,6 +1,5 @@
-import {Request, Response} from 'express';
 import {deleteTestProduct, findProducts, saveProduct, updateTestProduct} from './db-data';
-
+import {Request, Response} from "express"
 
 export function addProduct(req: Request, res: Response) {
 
