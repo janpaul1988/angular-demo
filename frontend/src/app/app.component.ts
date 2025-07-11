@@ -11,7 +11,7 @@ import {UserService} from "./service/user.service";
   selector: 'app-root',
   imports: [RouterOutlet, MatToolbar, MatButton, RouterLink, MatIcon],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
 

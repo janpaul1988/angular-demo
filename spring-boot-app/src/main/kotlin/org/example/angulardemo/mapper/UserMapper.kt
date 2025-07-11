@@ -10,7 +10,7 @@ class UserMapper {
     fun toEntity(user: UserDTO): User {
         return User(
             id = user.id,
-            email = user.email
+            email = user.email!!
         )
     }
 

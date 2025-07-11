@@ -1,0 +1,17 @@
+<form #jobForm="ngForm" (ngSubmit)="finishJob(jobForm)" class="finish-job-form">
+  <mat-form-field appearance="fill">
+    <mat-label>Choose an end date</mat-label>
+    <input matInput readonly [matDatepicker]="picker" [min]="job.startDate" [(ngModel)]="job.endDate" name="endDate"
+           #endDate="ngModel" required>
+    <mat-datepicker-toggle matIconSuffix [for]="picker">
+      <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+    </mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <div class="form-actions">
+    <button mat-raised-button color="primary" type="submit" [disabled]="jobForm.invalid" class="action-button">
+      <mat-icon>check_circle</mat-icon>
+      Finish Current Job
+    </button>
+  </div>
+</form>

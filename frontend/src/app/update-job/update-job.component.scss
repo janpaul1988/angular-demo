@@ -1,0 +1,9 @@
+@use '../styles' as styles;
+
+.update-job-container {
+  @extend .card;
+
+  form {
+    @extend .standard-form;
+  }
+}

@@ -1,20 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cinzel">
-  <title>Angular Demo</title>
-</head>
-<body>
 <mat-toolbar>
   <button mat-raised-button routerLink="">
     <mat-icon>home</mat-icon>
     Home
   </button>
-  <h1 class="app-title">Angular Demo</h1>
+  <h1 class="app-title">Job Journaler</h1>
   <h1 class="welcome-message">Welcome {{ userData()?.email }}</h1>
   <button mat-raised-button (click)="logOut()" color="accent">
     <mat-icon>logout</mat-icon>
@@ -22,5 +11,3 @@
   </button>
 </mat-toolbar>
 <router-outlet></router-outlet>
-</body>
-</html>

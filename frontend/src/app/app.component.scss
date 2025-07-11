@@ -1,0 +1,71 @@
+@use 'styles/variables' as vars;
+@use 'styles/common';
+
+/* ===== TOOLBAR STYLING ===== */
+mat-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: vars.$spacing-standard;
+
+  button {
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+}
+
+// Typography
+.app-title {
+  font-family: vars.$font-family-title;
+  font-size: vars.$font-size-xxlarge;
+  margin: 0;
+  padding: 0 vars.$spacing-small;
+}
+
+.welcome-message {
+  font-size: vars.$font-size-normal;
+  margin: 0;
+  color: vars.$text-color-muted;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-xsmall;
+}
+
+.center-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 600px) {
+  mat-toolbar {
+    flex-direction: column;
+    padding: vars.$spacing-standard 0;
+    height: auto;
+
+    button {
+      width: 100%;
+      margin: 4px 0;
+    }
+  }
+
+  .page-container {
+    padding: vars.$spacing-small;
+  }
+
+  .standard-form {
+    .form-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

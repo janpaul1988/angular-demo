@@ -1,0 +1,25 @@
+<div class="update-job-container">
+  <form #jobForm="ngForm" (ngSubmit)="updateJob()">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput type="text" [(ngModel)]="job.title" name="name" placeholder="Name" required #name="ngModel">
+      @if (name.invalid && name.touched) {
+        <mat-error>
+          @if (name.errors?.['required']) {
+            <span class="error-message">Name is required.</span>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <input matInput type="text" [(ngModel)]="job.description" name="description" placeholder="Description">
+    </mat-form-field>
+    <div class="form-actions">
+      <button mat-raised-button type="submit" color="accent" [disabled]="jobForm.invalid" class="action-button">
+        <mat-icon>update</mat-icon>
+        Update Job
+      </button>
+    </div>
+  </form>
+</div>

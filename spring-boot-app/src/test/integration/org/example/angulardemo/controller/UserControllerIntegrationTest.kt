@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.example.angulardemo.dto.UserDTO
 import org.example.angulardemo.entity.User
-import org.example.angulardemo.repository.ProductCrudRepository
+import org.example.angulardemo.repository.JobCrudRepository
 import org.example.angulardemo.repository.UserCrudRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
@@ -21,19 +21,19 @@ import kotlin.test.Test
 class UserControllerIntegrationTest(
     @Autowired private val webTestClient: WebTestClient,
     @Autowired private val userCrudRepository: UserCrudRepository,
-    @Autowired private val productCrudRepository: ProductCrudRepository,
+    @Autowired private val jobCrudRepository: JobCrudRepository,
 ) {
 
     @BeforeTest
     fun setup() = runBlocking {
         // Given empty tables in the database.
-        productCrudRepository.deleteAll()
+        jobCrudRepository.deleteAll()
         userCrudRepository.deleteAll()
     }
 
     @Test
     fun `should retrieve user successfully by email`() = runTest {
-        // Given: Save the products reactively and prepare the expected results.
+        // Given: Save the jobs reactively and prepare the expected results.
         val email = "testuser@testuser"
         User(email = email)
             .let {
@@ -43,14 +43,14 @@ class UserControllerIntegrationTest(
                 UserDTO(it.id, it.email)
             }
             .also {
-                // When: Send a GET request to retrieve all products.
+                // When: Send a GET request to retrieve all jobs.
                 webTestClient.get()
                     .uri("/users")
                     .header("X-Forwarded-Email", email)
                     .exchange()
                     .expectStatus().isOk
                     .expectBody(UserDTO::class.java)
-                    // Then: Verify the response matches the saved products.
+                    // Then: Verify the response matches the saved jobs.
                     .equals(it)
             }
     }

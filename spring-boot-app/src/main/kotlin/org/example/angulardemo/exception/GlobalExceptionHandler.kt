@@ -12,10 +12,16 @@ private val logger = KotlinLogging.logger {}
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler(ProductNotFoundException::class, UserNotFoundException::class)
-    fun handleProductNotFoundException(ex: RuntimeException): ResponseEntity<String> {
+    @ExceptionHandler(JobNotFoundException::class, UserNotFoundException::class)
+    fun handleEntityNotFoundException(ex: RuntimeException): ResponseEntity<String> {
         logger.error { ex.message }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.message)
+    }
+
+    @ExceptionHandler(JobConstraintViolationException::class, JobStartDateViolationException::class)
+    fun handleDataConstraintException(ex: RuntimeException): ResponseEntity<String> {
+        logger.error { ex.message }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.message)
     }
 
     @ExceptionHandler(WebExchangeBindException::class)

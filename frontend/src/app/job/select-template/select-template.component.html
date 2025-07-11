@@ -1,0 +1,31 @@
+<div class="template-selection">
+  <h2>Select a Journal Template</h2>
+
+  @if (templates.length > 0) {
+    <div class="existing-templates">
+      <h3>Use Existing Template</h3>
+      <mat-selection-list [multiple]="false" (selectionChange)="onTemplateSelected($event)">
+        @for (template of templates; track template.id) {
+          <mat-list-option [value]="template">
+            <div class="template-option">
+              <span>{{ template.name }}</span>
+              <button mat-icon-button color="accent"
+                      (click)="editTemplate($event, template)"
+                      [disabled]="!canUpdateTemplate(template)"
+                      [matTooltip]="canUpdateTemplate(template) ? 'Edit template' : 'Cannot edit template that is already in use'">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </mat-list-option>
+        }
+      </mat-selection-list>
+    </div>
+  }
+
+  <div class="create-new">
+    <h3>Or Create New Template</h3>
+    <button mat-raised-button color="primary" (click)="createNewTemplate()">
+      Create New Template
+    </button>
+  </div>
+</div>

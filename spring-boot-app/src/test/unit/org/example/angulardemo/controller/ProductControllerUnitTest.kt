@@ -5,180 +5,180 @@ import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.flow.flowOf
-import org.example.angulardemo.dto.ProductDTO
-import org.example.angulardemo.exception.ProductNotFoundException
-import org.example.angulardemo.service.ProductService
+import org.example.angulardemo.dto.JobDTO
+import org.example.angulardemo.exception.JobNotFoundException
+import org.example.angulardemo.service.JobService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.test.web.reactive.server.WebTestClient
 
-@WebFluxTest(controllers = [ProductController::class])
+@WebFluxTest(controllers = [JobController::class])
 @AutoConfigureWebTestClient
-class ProductControllerUnitTest(
+class jobControllerUnitTest(
     @Autowired
     val webTestClient: WebTestClient,
 ) {
     @MockkBean(relaxed = true)
-    lateinit var productService: ProductService
+    lateinit var jobService: JobService
 
 
     @Test
-    fun `should add product for user`() {
+    fun `should add job for user`() {
         val userId = 1L
-        val productToAdd = ProductDTO(null, userId, "testname", "testdescription")
-        val productAdded = productToAdd.copy(id = 1L)
+        val jobToAdd = JobDTO(null, userId, "testname", "testdescription")
+        val jobAdded = jobToAdd.copy(id = 1L)
         // Given
 
-        coEvery { productService.addProduct(userId, productToAdd) } returns productAdded
+        coEvery { jobService.addJob(userId, jobToAdd) } returns jobAdded
 
         webTestClient.post()                                                           // When
-            .uri("/products/$userId")
-            .bodyValue(productToAdd)
+            .uri("/jobs/$userId")
+            .bodyValue(jobToAdd)
             .exchange()
             .expectStatus().isCreated                                                  // Then
-            .expectBody(ProductDTO::class.java)
-            .isEqualTo(productAdded)
+            .expectBody(JobDTO::class.java)
+            .isEqualTo(jobAdded)
 
-        coVerify(exactly = 1) { productService.addProduct(userId, productToAdd) }
+        coVerify(exactly = 1) { jobService.addJob(userId, jobToAdd) }
 
     }
 
     @Test
-    fun `should not add product for user without name`() {
-        ProductDTO(null, 1L, name = "", description = "testdescription")                         // Given
+    fun `should not add job for user without name`() {
+        JobDTO(null, 1L, title = "", description = "testdescription")                         // Given
             .also {
                 webTestClient.post()                                                   // When
-                    .uri("/products/${it.userId}")
+                    .uri("/jobs/${it.userId}")
                     .bodyValue(it)
                     .exchange()
                     .expectStatus().isBadRequest                                       // Then
                     .expectBody(String::class.java)
-                    .isEqualTo("Product name cannot be blank.")
+                    .isEqualTo("job name cannot be blank.")
             }.also {
-                coVerify { productService wasNot Called }
+                coVerify { jobService wasNot Called }
             }
     }
 
     @Test
-    fun `should update product`() {
+    fun `should update job`() {
 
-        ProductDTO(1L, 1L, name = "testName", description = "testdescription")                          // Given
+        JobDTO(1L, 1L, title = "testName", description = "testdescription")                          // Given
             .let {
                 // Pair the request to its expected result.
-                it to it.copy(id = it.id, userId = it.userId, name = "updatedName", description = "updatedDescription")
+                it to it.copy(id = it.id, userId = it.userId, title = "updatedName", description = "updatedDescription")
             }.also {
-                coEvery { productService.updateProduct(it.first.userId, it.first.id!!, it.first) } returns it.second
+                coEvery { jobService.updateJob(it.first.userId, it.first.id!!, it.first) } returns it.second
             }.also {                                                      // When
                 webTestClient.put()
-                    .uri("/products/${it.first.userId}/${it.first.id}")
+                    .uri("/jobs/${it.first.userId}/${it.first.id}")
                     .bodyValue(it.first)
                     .exchange()
                     .expectStatus().isOk                                                              // Then
-                    .expectBody(ProductDTO::class.java)
+                    .expectBody(JobDTO::class.java)
                     .isEqualTo(it.second)
             }.also {// Then
-                coVerify(exactly = 1) { productService.updateProduct(it.first.userId, it.first.id!!, it.first) }
+                coVerify(exactly = 1) { jobService.updateJob(it.first.userId, it.first.id!!, it.first) }
             }
     }
 
     @Test
-    fun `should not update invalid product`() {
+    fun `should not update invalid job`() {
 
-        ProductDTO(1L, 1L, name = "", description = "testdescription")          // Given
+        JobDTO(1L, 1L, title = "", description = "testdescription")          // Given
             .also {
                 webTestClient.put()                                             // When
-                    .uri("/products/${it.userId}/${it.id}")
+                    .uri("/jobs/${it.userId}/${it.id}")
                     .bodyValue(it)
                     .exchange()
                     .expectStatus().isBadRequest                                // Then
                     .expectBody(String::class.java)
-                    .isEqualTo("Product name cannot be blank.")
+                    .isEqualTo("job name cannot be blank.")
             }.also {
-                coVerify { productService wasNot Called }
+                coVerify { jobService wasNot Called }
             }
     }
 
     @Test
-    fun `should not update non-existing product`() {
+    fun `should not update non-existing job`() {
 
-        ProductDTO(1L, 1L, name = "testName", description = "testdescription")            // Given
+        JobDTO(1L, 1L, title = "testName", description = "testdescription")            // Given
             .also {
                 coEvery {
-                    productService.updateProduct(
+                    jobService.updateJob(
                         it.userId,
                         it.id!!,
                         it
                     )
-                } throws ProductNotFoundException(it.userId, it.id!!)
+                } throws JobNotFoundException(it.userId, it.id!!)
             }
             .also {
                 webTestClient.put()                                                      // When
-                    .uri("/products/${it.userId}/${it.id}")
+                    .uri("/jobs/${it.userId}/${it.id}")
                     .bodyValue(it)
                     .exchange()
                     .expectStatus().isNotFound                                          // Then
                     .expectBody(String::class.java)
-                    .isEqualTo("Product with id: ${it.id} not found for user with id: ${it.userId}")
+                    .isEqualTo("job with id: ${it.id} not found for user with id: ${it.userId}")
             }
             .also {
-                coVerify(exactly = 1) { productService.updateProduct(it.userId, it.id!!, it) }
+                coVerify(exactly = 1) { jobService.updateJob(it.userId, it.id!!, it) }
             }
     }
 
     @Test
-    fun `should retrieve all products successfully`() {
+    fun `should retrieve all jobs successfully`() {
         val userId = 1L
         // Given
         arrayOf(
-            ProductDTO(1, userId, "testname1", "testdescription1"),
-            ProductDTO(2, userId, "testname2", "testdescription2")
+            JobDTO(1, userId, "testname1", "testdescription1"),
+            JobDTO(2, userId, "testname2", "testdescription2")
         )
             .also {
-                coEvery { productService.getAllProductsForUser(userId) } returns flowOf(*it)
+                coEvery { jobService.getAllJobsForUser(userId) } returns flowOf(*it)
             }
             .also {
                 webTestClient.get()
-                    .uri("/products/${userId}")
+                    .uri("/jobs/${userId}")
                     .exchange()
                     .expectStatus().isOk
-                    .expectBodyList(ProductDTO::class.java)
+                    .expectBodyList(JobDTO::class.java)
                     .contains(*it)
             }
             .also {
-                coVerify(exactly = 1) { productService.getAllProductsForUser(userId) }
+                coVerify(exactly = 1) { jobService.getAllJobsForUser(userId) }
             }
     }
 
     @Test
-    fun `should delete product`() {
+    fun `should delete job`() {
         val id = 1L                                                 // Given
         val userId = 1L
 
         webTestClient.delete()                                      // When
-            .uri("/products/$userId/$id")
+            .uri("/jobs/$userId/$id")
             .exchange()
             .expectStatus().isNoContent                             // Then
 
-        coVerify(exactly = 1) { productService.deleteProduct(userId, id) }
+        coVerify(exactly = 1) { jobService.deleteJob(userId, id) }
     }
 
     @Test
-    fun `should not delete non-existing product`() {
+    fun `should not delete non-existing job`() {
         val id = 1L                                                                                        // Given
         val userId = 1L
 
-        coEvery { productService.deleteProduct(userId, id) } throws ProductNotFoundException(userId, id)
+        coEvery { jobService.deleteJob(userId, id) } throws JobNotFoundException(userId, id)
 
         webTestClient.delete()                                                                             // When
-            .uri("/products/$userId/$id")
+            .uri("/jobs/$userId/$id")
             .exchange()
             .expectStatus().isNotFound                                                                     // Then
             .expectBody(String::class.java)
-            .isEqualTo("Product with id: $id not found for user with id: $userId")
+            .isEqualTo("job with id: $id not found for user with id: $userId")
 
-        coVerify(exactly = 1) { productService.deleteProduct(userId, id) }
+        coVerify(exactly = 1) { jobService.deleteJob(userId, id) }
 
     }
 
@@ -189,19 +189,19 @@ class ProductControllerUnitTest(
         val userId = 1L
 
         coEvery {
-            productService.deleteProduct(
+            jobService.deleteJob(
                 userId,
                 id
             )
         } throws Exception("Potentially sensitive system information")
 
         webTestClient.delete()                                                                                   // When
-            .uri("/products/$userId/$id")
+            .uri("/jobs/$userId/$id")
             .exchange()
             .expectStatus().is5xxServerError                                                                     // Then
             .expectBody(String::class.java)
             .isEqualTo("An unexpected internal server error occurred. Please contact the system administrator.")
 
-        coVerify(exactly = 1) { productService.deleteProduct(userId, id) }
+        coVerify(exactly = 1) { jobService.deleteJob(userId, id) }
     }
 }

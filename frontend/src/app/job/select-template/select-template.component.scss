@@ -1,0 +1,71 @@
+@use '../../styles' as styles;
+@use '../../styles/variables' as vars;
+
+.template-selection {
+  @extend .page-container;
+  @extend .card;
+
+  // Headings
+  h2 {
+    margin: 0 0 vars.$spacing-large 0;
+    color: vars.$text-color-primary;
+    font-size: vars.$font-size-xlarge;
+    font-weight: 500;
+  }
+
+  h3 {
+    margin: 0 0 vars.$spacing-standard 0;
+    color: vars.$text-color-secondary;
+    font-size: vars.$font-size-medium;
+    font-weight: 500;
+  }
+
+  // Template list section
+  .existing-templates {
+    margin-bottom: vars.$spacing-xlarge;
+
+    mat-selection-list {
+      border: 1px solid vars.$border-color;
+      border-radius: vars.$border-radius-small;
+      overflow: hidden;
+
+      ::ng-deep .mat-list-item-content {
+        padding: vars.$spacing-standard !important;
+      }
+
+      mat-list-option {
+        &:hover {
+          background-color: vars.$background-hover;
+        }
+
+        &.mat-list-item-focus {
+          background-color: vars.$primary-light;
+        }
+
+        ::ng-deep .mat-list-text {
+          padding: vars.$spacing-xsmall 0;
+        }
+
+        ::ng-deep .mat-pseudo-checkbox-checked {
+          background-color: vars.$primary-color;
+        }
+      }
+    }
+  }
+
+  // Create new template section
+  .create-new {
+    margin-top: vars.$spacing-large;
+    padding-top: vars.$spacing-large;
+    border-top: 1px solid vars.$border-color;
+
+    button {
+      min-width: 200px;
+      font-weight: 500;
+
+      &.mat-primary {
+        background-color: vars.$primary-color;
+      }
+    }
+  }
+}

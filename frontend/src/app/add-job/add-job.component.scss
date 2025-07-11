@@ -1,0 +1,5 @@
+@use '../styles' as styles;
+
+.add-job-form {
+  @extend .standard-form;
+}

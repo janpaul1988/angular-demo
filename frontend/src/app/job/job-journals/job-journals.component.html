@@ -1,0 +1,123 @@
+<!-- job-journals.component.html -->
+<div class="journal-container">
+  <!-- Part 1: Week Selection Header -->
+  <div class="weeks-header">
+    <h2>Weekly Journals for "{{ job.title }}"</h2>
+
+    @if (weeks.length > 0) {
+      <div class="weeks-navigation">
+        <button
+          mat-icon-button
+          [disabled]="currentPageIndex === 0"
+          (click)="previousWeeksPage()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <div class="weeks-container">
+          <!-- Weeks grid -->
+          <div class="weeks-grid">
+            @for (week of visibleWeeks; track week.weekNumber + '-' + week.year) {
+              <div
+                class="week-item"
+                [class.active]="selectedWeek?.weekNumber === week.weekNumber && selectedWeek?.year === week.year"
+                [class.current]="week.isCurrent"
+                [class.year-boundary]="isYearBoundary(week)"
+                (click)="selectWeek(week)">
+                <div class="week-number">W{{ week.weekNumber }}</div>
+                <div class="week-dates">{{ week.startDate | date:'MMM d' }}</div>
+              </div>
+            }
+          </div>
+
+          <!-- Year indicators -->
+          <div class="year-indicators">
+            @for (year of getVisibleYears(); track year) {
+              <div class="year-indicator"
+                   [style.grid-column]="getYearColumnSpan(year)">
+                {{ year }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <button
+          mat-icon-button
+          [disabled]="currentPageIndex >= maxPageIndex"
+          (click)="nextWeeksPage()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    } @else {
+      <div class="future-job-message">
+        <p>This job hasn't started yet. The weeks will appear when the job starts.</p>
+        <p class="job-start-date">Job starts on: {{ job.startDate | date:'longDate' }}</p>
+      </div>
+    }
+  </div>
+
+  <!-- Part 2: Journal Form -->
+  @if (selectedWeek && journalTemplate) {
+    <div class="journal-form-container">
+      <h3>{{ journalTemplate.name }} - Week {{ selectedWeek.weekNumber }}, {{ selectedWeek.year }}</h3>
+
+      <form [formGroup]="journalForm" (ngSubmit)="saveJournal()">
+        @for (question of journalTemplate.content; track question.id) {
+          <div class="form-group">
+            <label [for]="question.id">{{ question.label }}</label>
+            <textarea
+              [id]="question.id"
+              [formControlName]="question.id"
+              class="form-control"
+              rows="4"
+              [required]="question.required">
+            </textarea>
+            @if (journalForm.get(question.id)?.invalid &&
+            (journalForm.get(question.id)?.dirty || journalForm.get(question.id)?.touched)
+            &&
+            journalForm.get(question.id)?.errors?.['required']) {
+              <div class="error-message">
+                <div>
+                  This field is required.
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="primary" class="action-button"
+                  [disabled]="journalForm.invalid">
+            Save Journal
+          </button>
+        </div>
+      </form>
+
+      @if (isSaving) {
+        <div class="saving-indicator">
+          <mat-spinner diameter="30"></mat-spinner>
+          <span>Saving...</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Template management section -->
+  <div class="template-management">
+    @if (!journalTemplate) {
+      <div class="no-template-message">
+        <p>No journal template is associated with this job.</p>
+        <div class="template-actions">
+          <button mat-raised-button color="primary" class="action-button" (click)="selectTemplate()">
+            Select a Template
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="template-actions">
+        <button mat-raised-button color="accent" class="action-button" (click)="updateTemplate()">
+          Update Template
+        </button>
+      </div>
+    }
+  </div>
+</div>
