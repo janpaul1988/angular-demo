@@ -9,18 +9,17 @@ import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import org.example.angulardemo.configuration.JobConfiguration
 import org.example.angulardemo.dto.JobDTO
 import org.example.angulardemo.entity.Job
 import org.example.angulardemo.entity.User
+import org.example.angulardemo.exception.JobConstraintViolationException
 import org.example.angulardemo.exception.JobNotFoundException
-import org.example.angulardemo.exception.UserNotFoundException
+import org.example.angulardemo.exception.JobStartDateViolationException
 import org.example.angulardemo.mapper.JobMapper
 import org.example.angulardemo.repository.JobCrudRepository
-import org.example.angulardemo.repository.UserCrudRepository
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
-import org.springframework.dao.DuplicateKeyException
+import java.time.LocalDate
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,14 +30,14 @@ class JobServiceUnitTest(
     @RelaxedMockK
     private val jobCrudRepositoryMockk: JobCrudRepository,
     @RelaxedMockK
-    private val userCrudRepositoryMockk: UserCrudRepository,
+    private val userServiceMockk: UserService,
     @RelaxedMockK
     private val jobMapperMockk: JobMapper,
-    @RelaxedMockK
-    private val jobConfigurationMockk: JobConfiguration,
     @InjectMockKs
     private val jobService: JobService,
 ) {
+
+    private val today = LocalDate.now()
 
     @BeforeTest()
     fun setUpLogging() {
@@ -49,193 +48,323 @@ class JobServiceUnitTest(
     @Test
     fun `should add new job`() = runTest {
         // Given
-        val jobDTO = mockk<JobDTO>()
-        val jobEntity = mockk<Job>(relaxed = true)
-        val savedJobEntity = mockk<Job>()
-        val savedJobDTO = mockk<JobDTO>()
         val userId = 1L
+        val startDate = today
+        val jobDTO = JobDTO(
+            id = null,
+            userId = userId,
+            title = "testJob",
+            description = "testDescription",
+            startDate = startDate,
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+        val jobEntity = Job(
+            id = null,
+            userId = userId,
+            title = "testJob",
+            description = "testDescription",
+            startDate = startDate,
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+        val savedJobEntity = jobEntity.copy(id = "1")
+        val savedJobDTO = jobDTO.copy(id = "1")
 
         // Mock behavior
-        every { jobConfigurationMockk.maxInserts } returns 10
-        coEvery { userCrudRepositoryMockk.findById(userId) } returns mockk<User>()
+        coEvery { userServiceMockk.doesUserExist(userId) } returns mockk<User>()
+        coEvery { jobCrudRepositoryMockk.findAllByUserIdAndEndDateIsNull(userId) } returns flowOf()
+        coEvery { jobCrudRepositoryMockk.findMaxEndDateByUserId(userId) } returns null
         every { jobMapperMockk.toEntity(jobDTO) } returns jobEntity
-        coEvery { jobCrudRepositoryMockk.findMaxExternalIdByUserId(userId) } returns 1L
-        every { jobConfigurationMockk.externalIdStartingValue } returns 0L
-        every { jobConfigurationMockk.externalIdIncrementValue } returns 1L
         coEvery { jobCrudRepositoryMockk.save(jobEntity) } returns savedJobEntity
         every { jobMapperMockk.toDto(savedJobEntity) } returns savedJobDTO
 
-        // Capture the externalId that is set.
-        val externalIdSlot = slot<Long>()
-        every { jobEntity.externalId = capture(externalIdSlot) } just Runs
-
         // When
-        val result = jobService.addJob(userId, jobDTO)
+        val result = jobService.addJob(jobDTO)
 
         // Then
-        coVerify(exactly = 1) { userCrudRepositoryMockk.findById(userId) }
+        coVerify(exactly = 1) { userServiceMockk.doesUserExist(userId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findAllByUserIdAndEndDateIsNull(userId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findMaxEndDateByUserId(userId) }
         verify(exactly = 1) { jobMapperMockk.toEntity(jobDTO) }
-
-        coVerify(exactly = 1) { jobCrudRepositoryMockk.findMaxExternalIdByUserId(userId) }
         coVerify(exactly = 1) { jobCrudRepositoryMockk.save(jobEntity) }
         verify(exactly = 1) { jobMapperMockk.toDto(savedJobEntity) }
         assertEquals(savedJobDTO, result)
-        assertEquals(2L, externalIdSlot.captured) // <-- This checks the incremented value
     }
 
     @Test
-    fun `add new job for user that does not exist should throw`() = runTest {
+    fun `add job for user should throw when there's already a job without end date`() = runTest {
         // Given
-        val jobDTO = mockk<JobDTO>()
         val userId = 1L
+        val startDate = today
+        val jobDTO = JobDTO(
+            id = null,
+            userId = userId,
+            title = "testJob",
+            description = "testDescription",
+            startDate = startDate,
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+        val existingJobEntity = Job(
+            id = "existing-job",
+            userId = userId,
+            title = "Existing Job",
+            description = "This job has no end date",
+            startDate = startDate.minusDays(30),
+            endDate = null,
+            currentJournalTemplateId = null
+        )
 
-        every { jobConfigurationMockk.maxInserts } returns 10
-        coEvery { userCrudRepositoryMockk.findById(userId) } returns null
-        assertFailsWith<UserNotFoundException> { jobService.addJob(userId, jobDTO) }
+        // Mock behavior
+        every { jobMapperMockk.toEntity(jobDTO) } returns Job(
+            id = null,
+            userId = userId,
+            title = "testJob",
+            description = "testDescription",
+            startDate = startDate,
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+        coEvery { userServiceMockk.doesUserExist(userId) } returns User(id = userId, email = "test@example.com")
+        coEvery { jobCrudRepositoryMockk.findAllByUserIdAndEndDateIsNull(userId) } returns flowOf(existingJobEntity)
 
-        coVerify(exactly = 1) { userCrudRepositoryMockk.findById(userId) }
-        verify { jobMapperMockk wasNot called }
-        coVerify { jobCrudRepositoryMockk wasNot called }
+
+        // When/Then
+        assertFailsWith<JobConstraintViolationException> {
+            jobService.addJob(jobDTO)
+        }
+
+        // Verify
+        coVerify(exactly = 1) { userServiceMockk.doesUserExist(userId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findAllByUserIdAndEndDateIsNull(userId) }
+        coVerify(exactly = 0) { jobCrudRepositoryMockk.save(any()) }
     }
 
     @Test
-    fun `add new job should reattempt insertion the correct number of times and when the amount-of-retries reaches zero should throw`() =
-        runTest {
-            // Given
-            val jobDTO = mockk<JobDTO>()
-            val jobEntity = mockk<Job>(relaxed = true)
-            val userId = 1L
+    fun `add job should throw when start date is before max end date`() = runTest {
+        // Given
+        val userId = 1L
+        val maxEndDate = today.minusDays(10)
+        val invalidStartDate = maxEndDate.minusDays(5)  // Start date before max end date
 
-            every { jobConfigurationMockk.maxInserts } returns 10
-            coEvery { userCrudRepositoryMockk.findById(userId) } returns mockk<User>()
-            every { jobMapperMockk.toEntity(jobDTO) } returns jobEntity
-            coEvery { jobCrudRepositoryMockk.findMaxExternalIdByUserId(userId) } returns 0L
-            every { jobConfigurationMockk.externalIdStartingValue } returns 0L
-            every { jobConfigurationMockk.externalIdIncrementValue } returns 1L
-            coEvery { jobCrudRepositoryMockk.save(jobEntity) } throws DuplicateKeyException("Error, key exists")
+        val jobDTO = JobDTO(
+            id = null,
+            userId = userId,
+            title = "testJob",
+            description = "testDescription",
+            startDate = invalidStartDate,
+            endDate = null,
+            currentJournalTemplateId = null
+        )
 
+        every { jobMapperMockk.toEntity(jobDTO) } returns Job(
+            id = null,
+            userId = userId,
+            title = "testJob",
+            description = "testDescription",
+            startDate = invalidStartDate,
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+        coEvery { userServiceMockk.doesUserExist(userId) } returns User(id = userId, email = "test@example.com")
+        coEvery { jobCrudRepositoryMockk.findAllByUserIdAndEndDateIsNull(userId) } returns flowOf()
+        coEvery { jobCrudRepositoryMockk.findMaxEndDateByUserId(userId) } returns maxEndDate
 
-            // When
-            assertFailsWith<IllegalStateException> { jobService.addJob(userId, jobDTO) }
-
-            // Then
-            coVerify(exactly = 10) { userCrudRepositoryMockk.findById(userId) }
-            verify(exactly = 10) { jobMapperMockk.toEntity(jobDTO) }
-            coVerify(exactly = 10) { jobCrudRepositoryMockk.findMaxExternalIdByUserId(userId) }
-            coVerify(exactly = 10) { jobCrudRepositoryMockk.save(jobEntity) }
-            verify(exactly = 0) { jobMapperMockk.toDto(any()) }
+        // When/Then
+        assertFailsWith<JobStartDateViolationException> {
+            jobService.addJob(jobDTO)
         }
+
+        // Verify
+        coVerify(exactly = 1) { userServiceMockk.doesUserExist(userId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findAllByUserIdAndEndDateIsNull(userId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findMaxEndDateByUserId(userId) }
+        coVerify(exactly = 0) { jobCrudRepositoryMockk.save(any()) }
+    }
 
     @Test
     fun `should get all jobs for a certain user`() = runTest {
         // Given
-        val jobFlow = flowOf(mockk<Job>(), mockk<Job>())
-        val jobList = jobFlow.toList()
-        val jobDTOLists = listOf(mockk<JobDTO>(), mockk<JobDTO>())
         val userId = 1L
-        coEvery { jobCrudRepositoryMockk.findAllByUserId(userId) } returns jobFlow
+        val job1 = Job(
+            id = "1",
+            userId = userId,
+            title = "Job 1",
+            description = "Description 1",
+            startDate = today.minusDays(30),
+            endDate = today.minusDays(15),
+            currentJournalTemplateId = null
+        )
+        val job2 = Job(
+            id = "2",
+            userId = userId,
+            title = "Job 2",
+            description = "Description 2",
+            startDate = today.minusDays(10),
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+        val jobFlow = flowOf(job1, job2)
 
-        // Pair jobs with their corresponding DTOs and mock the mapper behavior
-        jobList.zip(jobDTOLists).forEach { (job, jobDTO) ->
-            every { jobMapperMockk.toDto(job) } returns jobDTO
-        }
+        val jobDTO1 = JobDTO(
+            id = "1",
+            userId = userId,
+            title = "Job 1",
+            description = "Description 1",
+            startDate = today.minusDays(30),
+            endDate = today.minusDays(15),
+            currentJournalTemplateId = null
+        )
+        val jobDTO2 = JobDTO(
+            id = "2",
+            userId = userId,
+            title = "Job 2",
+            description = "Description 2",
+            startDate = today.minusDays(10),
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+        val jobDTOList = listOf(jobDTO1, jobDTO2)
+
+        coEvery { jobCrudRepositoryMockk.findAllByUserId(userId) } returns jobFlow
+        every { jobMapperMockk.toDto(job1) } returns jobDTO1
+        every { jobMapperMockk.toDto(job2) } returns jobDTO2
 
         // When
         val result = jobService.getAllJobsForUser(userId).toList()
 
         // Then
         coVerify(exactly = 1) { jobCrudRepositoryMockk.findAllByUserId(userId) }
-        verify(exactly = jobList.size) { jobMapperMockk.toDto(any()) }
+        verify(exactly = 1) { jobMapperMockk.toDto(job1) }
+        verify(exactly = 1) { jobMapperMockk.toDto(job2) }
 
-        assertEquals(jobDTOLists, result)
+        assertEquals(jobDTOList, result)
     }
 
 
     @Test
     fun `should update job`() = runTest {
-        val jobId = 1L
+        // Given
+        val jobId = "1"
         val userId = 1L
-        val jobDTO = JobDTO(jobId, userId, title = "testUpdate", description = "testUpdate")
-        val jobEntity = Job(null, userId, jobId, title = "test", description = "update")
-        val jobEntityToSave = jobEntity.copy(
-            title = jobDTO.title,
-            description = jobDTO.description
+
+        val existingJob = Job(
+            id = jobId,
+            userId = userId,
+            title = "Original Title",
+            description = "Original Description",
+            startDate = today.minusDays(10),
+            endDate = null,
+            currentJournalTemplateId = null
         )
-        val savedJobEntity = mockk<Job>()
-        val savedJobDTO = mockk<JobDTO>()
 
-        coEvery { jobCrudRepositoryMockk.findByUserIdAndExternalId(userId, jobId) } returns jobEntity
-        coEvery {
-            jobCrudRepositoryMockk.save(
-                jobEntityToSave
-            )
-        } returns savedJobEntity
+        val jobDTO = JobDTO(
+            id = jobId,
+            userId = userId,
+            title = "Updated Title",
+            description = "Updated Description",
+            startDate = today.minusDays(10),
+            endDate = today,
+            currentJournalTemplateId = "template-123"
+        )
 
-        every { jobMapperMockk.toDto(savedJobEntity) } returns savedJobDTO
+        val updatedJob = Job(
+            id = jobId,
+            userId = userId,
+            title = "Updated Title",
+            description = "Updated Description",
+            startDate = today.minusDays(10),
+            endDate = today,
+            currentJournalTemplateId = "template-123"
+        )
+
+        val updatedJobDTO = jobDTO.copy()
+
+        coEvery { jobCrudRepositoryMockk.findById(jobId) } returns existingJob
+        coEvery { jobCrudRepositoryMockk.save(any()) } returns updatedJob
+        every { jobMapperMockk.toEntity(jobDTO) } returns updatedJob
+        every { jobMapperMockk.toDto(updatedJob) } returns updatedJobDTO
 
         // When
-        val result = jobService.updateJob(userId, jobId, jobDTO)
+        val result = jobService.updateJob(jobDTO)
 
         // Then
-        coVerify(exactly = 1) { jobCrudRepositoryMockk.findByUserIdAndExternalId(userId, jobId) }
-        coVerify(exactly = 1) { jobCrudRepositoryMockk.save(jobEntityToSave) }
-        verify(exactly = 1) { jobMapperMockk.toDto(savedJobEntity) }
-
-        assertEquals(savedJobDTO, result)
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findById(jobId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.save(any()) }
+        verify(exactly = 1) { jobMapperMockk.toDto(updatedJob) }
+        assertEquals(updatedJobDTO, result)
     }
 
     @Test
     fun `update job that does not exist should throw`() = runTest {
         // Given
+        val jobId = "non-existing-id"
         val userId = 1L
-        val jobId = 1L
-        coEvery {
-            jobCrudRepositoryMockk.findByUserIdAndExternalId(
-                userId,
-                jobId
-            )
-        } returns null
 
-        // When
+        val jobDTO = JobDTO(
+            id = jobId,
+            userId = userId,
+            title = "Updated Title",
+            description = "Updated Description",
+            startDate = today.minusDays(10),
+            endDate = today,
+            currentJournalTemplateId = null
+        )
+
+        coEvery { jobCrudRepositoryMockk.findById(jobId) } returns null
+
+        // When/Then
         assertFailsWith<JobNotFoundException> {
-            jobService.updateJob(userId, jobId, mockk<JobDTO>())
+            jobService.updateJob(jobDTO)
         }
 
-        // Then
-        coVerify(exactly = 1) { jobCrudRepositoryMockk.findByUserIdAndExternalId(userId, jobId) }
+        // Verify
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findById(jobId) }
         coVerify(exactly = 0) { jobCrudRepositoryMockk.save(any()) }
-        verify { jobMapperMockk wasNot called }
+        verify(exactly = 0) { jobMapperMockk.toDto(any()) }
     }
 
     @Test
     fun `should delete job`() = runTest {
         // Given
-        val userId = 1L
-        val jobId = 1L
-        coEvery { jobCrudRepositoryMockk.findByUserIdAndExternalId(userId, jobId) } returns mockk<Job>()
+        val jobId = "1"
+
+        val existingJob = Job(
+            id = jobId,
+            userId = 1L,
+            title = "Job to Delete",
+            description = "This job will be deleted",
+            startDate = today.minusDays(10),
+            endDate = null,
+            currentJournalTemplateId = null
+        )
+
+        coEvery { jobCrudRepositoryMockk.findById(jobId) } returns existingJob
+        coEvery { jobCrudRepositoryMockk.deleteById(jobId) } returns Unit
 
         // When
-        jobService.deleteJob(userId, jobId)
+        jobService.deleteJob(jobId)
 
         // Then
-        coVerify(exactly = 1) { jobCrudRepositoryMockk.findByUserIdAndExternalId(userId, jobId) }
-        coVerify(exactly = 1) { jobCrudRepositoryMockk.deleteByUserIdAndExternalId(userId, jobId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findById(jobId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.deleteById(jobId) }
     }
 
     @Test
     fun `delete job that does not exist should throw`() = runTest {
         // Given
-        val userId = 1L
-        val jobId = 1L
-        coEvery { jobCrudRepositoryMockk.findByUserIdAndExternalId(userId, jobId) } returns null
+        val jobId = "non-existing-id"
 
-        // When
+        coEvery { jobCrudRepositoryMockk.findById(jobId) } returns null
+
+        // When/Then
         assertFailsWith<JobNotFoundException> {
-            jobService.deleteJob(userId, jobId)
+            jobService.deleteJob(jobId)
         }
 
         // Then
-        coVerify(exactly = 1) { jobCrudRepositoryMockk.findByUserIdAndExternalId(userId, jobId) }
-        coVerify(exactly = 0) { jobCrudRepositoryMockk.deleteByUserIdAndExternalId(userId, jobId) }
+        coVerify(exactly = 1) { jobCrudRepositoryMockk.findById(jobId) }
+        coVerify(exactly = 0) { jobCrudRepositoryMockk.deleteById(any()) }
     }
 }

@@ -38,17 +38,22 @@ class JournalTemplateService(
         var journalTemplate = journalTemplateMapper.toEntity(journalTemplateDTO)
         userService.doesUserExist(journalTemplate.userId)
 
-        return transactionalOperator.execute { tx ->
+        return transactionalOperator.execute { _ ->
             mono {
+                // Find the max version for templates with this name and userId
                 val maxVersion = journalTemplateRepository.findMaxVersionByUserIdAndName(
                     journalTemplate.userId,
                     journalTemplate.name
                 ) ?: 0
-                journalTemplate.version = maxVersion + 1
 
-                journalTemplateRepository.save(
-                    journalTemplate
-                )
+                // Set the new version (increment by 1)
+                journalTemplate.version = maxVersion + 1
+                
+                // Save the template with the new version
+                val savedTemplate = journalTemplateRepository.save(journalTemplate)
+
+                // Return the saved template
+                savedTemplate
             }
         }.awaitSingle().let {
             journalTemplateMapper.toDto(it)

@@ -100,7 +100,6 @@ export class JournalService {
       .set('jobId', jobId)
       .set('year', year.toString())
       .set('week', weekNumber.toString());
-    console.log("are we getting to the service?")
     return this.http.get<Journal>(`${this.apiUrl}`, {params}).pipe(
       catchError(err => {
         console.error(`Service error finding journal: jobId=${jobId}, year=${year}, week=${weekNumber}`, err);

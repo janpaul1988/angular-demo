@@ -12,7 +12,10 @@ private val logger = KotlinLogging.logger {}
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler(JobNotFoundException::class, UserNotFoundException::class)
+    @ExceptionHandler(
+        JobNotFoundException::class, UserNotFoundException::class,
+        JournalNotFoundException::class, JournalTemplateNotFoundException::class
+    )
     fun handleEntityNotFoundException(ex: RuntimeException): ResponseEntity<String> {
         logger.error { ex.message }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.message)

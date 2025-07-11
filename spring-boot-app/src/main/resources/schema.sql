@@ -1,5 +1,7 @@
+DROP TABLE IF EXISTS journal;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS job;
+DROP TABLE IF EXISTS journal_template;
 DROP TABLE IF EXISTS user;
 
 CREATE TABLE user
@@ -26,7 +28,7 @@ CREATE TABLE job
     description TEXT,
     start_date               DATE         NOT NULL,
     end_date                 DATE,
-    currentJournalTemplateId CHAR(36) REFERENCES journal_template (id),
+    current_journal_template_id CHAR(36) REFERENCES journal_template (id),
     UNIQUE (user_id, title)
 );
 

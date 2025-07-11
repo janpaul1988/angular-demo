@@ -8,14 +8,9 @@ import java.time.LocalDate
 
 interface JobCrudRepository : CoroutineCrudRepository<Job, String> {
     suspend fun findAllByUserId(userId: Long): Flow<Job>
-    suspend fun deleteByUserIdAndExternalId(userId: Long, externalId: Long)
-    suspend fun findAllByUserIdAndEndDateIsNull(userId: Long): Flow<Job>;
-
-    @Query("SELECT MAX(external_id) FROM job WHERE user_id = :userId")
-    suspend fun findMaxExternalIdByUserId(userId: Long): Long?
+    suspend fun deleteByUserId(userId: Long)
+    suspend fun findAllByUserIdAndEndDateIsNull(userId: Long): Flow<Job>
 
     @Query("SELECT MAX(end_date) FROM job WHERE user_id = :userId")
     suspend fun findMaxEndDateByUserId(userId: Long): LocalDate?
-
-
 }

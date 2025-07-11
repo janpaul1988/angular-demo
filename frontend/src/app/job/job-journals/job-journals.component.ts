@@ -11,7 +11,7 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {DatePipe} from "@angular/common";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {catchError, EMPTY, Observable, switchMap, tap, of} from "rxjs";
+import {catchError, EMPTY, Observable, switchMap, tap} from "rxjs";
 
 @Component({
   selector: 'app-job-journals',
@@ -170,7 +170,6 @@ export class JobJournalComponent implements OnInit {
     this.journalService.getJournal(this.job.id!!, week.year, week.weekNumber)
       .pipe(
         tap(journal => {
-          console.log('Journal loaded:', journal);
           this.currentJournal = journal;
         }),
         // Load the template based on the journal's templateId or job's current template

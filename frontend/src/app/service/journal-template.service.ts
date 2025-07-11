@@ -34,6 +34,8 @@ export class JournalTemplateService {
   }
 
   createJournalTemplate(journalTemplate: JournalTemplate) {
+    // Always set id to null, in case we are version-incrementing an existing template.
+    journalTemplate.id = undefined;
     return this.http.post<JournalTemplate>(`${this.apiUrl}`, journalTemplate)
       .pipe(
         catchError(err => {

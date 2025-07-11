@@ -1,6 +1,7 @@
 package org.example.angulardemo.controller
 
 import jakarta.validation.Valid
+import kotlinx.coroutines.flow.Flow
 import org.example.angulardemo.dto.JournalDTO
 import org.example.angulardemo.service.JournalService
 import org.springframework.http.HttpStatus
@@ -23,7 +24,7 @@ class JournalController(
         journalService.getJournalByYearWeekAndJobId(year, week, jobId)
 
     @GetMapping("/job/{jobId}")
-    suspend fun getJournalsJobId(@PathVariable jobId: String): JournalDTO =
+    suspend fun getJournalsJobId(@PathVariable jobId: String): Flow<JournalDTO> =
         journalService.getJournalsByJobId(jobId)
 
     @PostMapping

@@ -9,13 +9,20 @@ describe('JobService', () => {
   let jobService: JobService;
   let userServiceSpy: any;
   let httpTestingController: HttpTestingController;
-  let JOB_URL: string;
+  let API_URL: string;
   let TEST_JOB: Job;
 
   beforeEach(() => {
     const fakeUser = {id: 1, email: 'test@test.com'};
-    JOB_URL = `/api/jobs/${fakeUser.id}`
-    TEST_JOB = {id: 1, userId: fakeUser.id, title: 'Job 1', description: 'Description of a job'};
+    API_URL = `/api/jobs`;
+    TEST_JOB = {
+      id: "1",
+      userId: fakeUser.id,
+      title: 'Job 1',
+      description: 'Description of a job',
+      startDate: "2020-01-01",
+      currentJournalTemplateId: "template-123"
+    };
 
     userServiceSpy = {
       user: {
@@ -23,6 +30,7 @@ describe('JobService', () => {
         reload: jasmine.createSpy('reload')
       }
     };
+
     TestBed.configureTestingModule({
       providers: [
         JobService,
@@ -31,9 +39,9 @@ describe('JobService', () => {
         {provide: UserService, useValue: userServiceSpy}
       ]
     });
-    // Make sure the user is set so the resource URL is valid
-    httpTestingController = TestBed.inject(HttpTestingController)
-    jobService = TestBed.inject(JobService)
+
+    httpTestingController = TestBed.inject(HttpTestingController);
+    jobService = TestBed.inject(JobService);
   });
 
   it('Should get all jobs', () => {
@@ -56,28 +64,32 @@ describe('JobService', () => {
 
 
   it('Should save a single job', () => {
-    jobService.addJob(TEST_JOB).subscribe()
-    const req = httpTestingController.expectOne(JOB_URL);
-    expect(req.request.method).toEqual("POST")
-    req.flush(TEST_JOB)
-  })
+    jobService.addJob(TEST_JOB).subscribe();
+    const req = httpTestingController.expectOne(API_URL);
+    expect(req.request.method).toEqual("POST");
+    req.flush(TEST_JOB);
+  });
 
   it('Should update a single job', () => {
     jobService.jobs.set([TEST_JOB]);
-    const testJobUpdate = {id: 1, name: 'Job Updated 1', description: 'Job Description Updated 1'}
-    jobService.updateJob(testJobUpdate).subscribe()
-    const req = httpTestingController.expectOne(`${JOB_URL}/${TEST_JOB.id}`)
-    expect(req.request.method).toEqual("PUT")
-    req.flush(testJobUpdate)
-  })
+    const testJobUpdate: Job = {
+      ...TEST_JOB,
+      title: 'Job Updated 1',
+      description: 'Job Description Updated 1'
+    };
+    jobService.updateJob(testJobUpdate).subscribe();
+    const req = httpTestingController.expectOne(API_URL);
+    expect(req.request.method).toEqual("PUT");
+    req.flush(testJobUpdate);
+  });
 
   it('Should delete a single job', () => {
     jobService.jobs.set([TEST_JOB]);
-    jobService.deleteJob(TEST_JOB).subscribe()
-    const req = httpTestingController.expectOne(`${JOB_URL}/${TEST_JOB.id}`)
-    expect(req.request.method).toEqual("DELETE")
-    req.flush(null)
-  })
+    jobService.deleteJob(TEST_JOB).subscribe();
+    const req = httpTestingController.expectOne(`${API_URL}/${TEST_JOB.id}`);
+    expect(req.request.method).toEqual("DELETE");
+    req.flush(null);
+  });
 
   afterEach(() => {
     httpTestingController.verify();

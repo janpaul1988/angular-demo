@@ -5,8 +5,8 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.example.angulardemo.dto.UserDTO
 import org.example.angulardemo.entity.User
-import org.example.angulardemo.repository.JobCrudRepository
 import org.example.angulardemo.repository.UserCrudRepository
+import org.example.angulardemo.util.DatabaseCleanupUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,14 +21,13 @@ import kotlin.test.Test
 class UserControllerIntegrationTest(
     @Autowired private val webTestClient: WebTestClient,
     @Autowired private val userCrudRepository: UserCrudRepository,
-    @Autowired private val jobCrudRepository: JobCrudRepository,
+    @Autowired private val databaseCleanupUtil: DatabaseCleanupUtil,
 ) {
 
     @BeforeTest
     fun setup() = runBlocking {
-        // Given empty tables in the database.
-        jobCrudRepository.deleteAll()
-        userCrudRepository.deleteAll()
+        // Use the centralized cleanup utility
+        databaseCleanupUtil.cleanDatabase()
     }
 
     @Test
@@ -74,7 +73,7 @@ class UserControllerIntegrationTest(
         // Then: Verify the user was created in the database.
         assertThat(user).isNotNull
         assertThat(user!!.email).isEqualTo(email)
-        assertThat(user!!.id).isNotNull
+        assertThat(user.id).isNotNull
     }
 
 
