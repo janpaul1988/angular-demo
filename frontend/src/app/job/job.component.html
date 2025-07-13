@@ -1,0 +1,41 @@
+<h2 class="jobs-title">Jobs</h2>
+
+@if (jobs() && jobs()!!.length > 0) {
+  <mat-list>
+    @for (job of jobs()?.slice()?.reverse(); let i = $index; track job.id) {
+      <mat-list-item [ngClass]="job.endDate ? 'inactive-job' : 'active-job'">
+        <h4 matListItemTitle>
+          <span>{{ job.title }}</span>
+        </h4>
+        <p matListItemLine class="job-description">{{ job.description }}</p>
+        @if (job.endDate) {
+          <p matListItemLine class="job-dates">
+            <span class="date-label">End:</span>
+            <span class="date-value">{{ job.endDate | date:'longDate' }}</span>
+          </p>
+        }
+        <p matListItemLine class="job-dates">
+          <span class="date-label">Start:</span>
+          <span class="date-value">{{ job.startDate| date:'longDate' }}</span>
+        </p>
+        <div class="job-actions">
+          <button mat-icon-button color="warn" (click)="deleteJob(job)" aria-label="Delete job">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="updateJob(job)" aria-label="Update job">
+            <mat-icon>update</mat-icon>
+          </button>
+          <button mat-raised-button color="primary" class="journal-button" (click)="openJobJournals(job)">
+            <mat-icon>book</mat-icon>
+            <span>Journals</span>
+          </button>
+        </div>
+      </mat-list-item>
+    }
+  </mat-list>
+} @else {
+  <div class="no-jobs-message">
+    <mat-icon color="accent">info</mat-icon>
+    <span>No jobs to list yet! Why not add one?</span>
+  </div>
+}

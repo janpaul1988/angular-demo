@@ -1,10 +1,13 @@
-<h2>Products</h2>
 <div class="container">
-  <div class="product-container" #scrollContainer>
-    <app-product/>
+  <div class="job-container" #scrollContainer>
+    <app-job/>
   </div>
   <mat-divider color="accent" class="vertical-divider"/>
-  <div class="add-product-container">
-    <app-add-product (productListUpdated)="scrollToBottom()"/>
+  <div class="add-job-container">
+    @if (activeJob()) {
+      <app-finish-job/>
+    } @else {
+      <app-add-job (jobListUpdated)="scrollToBottom()"/>
+    }
   </div>
 </div>

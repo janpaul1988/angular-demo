@@ -1,0 +1,106 @@
+@use '../../styles' as styles;
+@use '../../styles/variables' as vars;
+@use 'sass:color';
+
+.template-creator {
+  padding: vars.$spacing-standard;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2 {
+    color: vars.$primary-color;
+    margin-bottom: vars.$spacing-large;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: vars.$spacing-small;
+    margin-bottom: vars.$spacing-standard;
+  }
+
+  .error-message {
+    background-color: color.adjust(vars.$error-color, $alpha: -0.8);
+    color: vars.$error-color;
+    padding: vars.$spacing-small;
+    border-radius: vars.$border-radius;
+    margin-bottom: vars.$spacing-standard;
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-small;
+  }
+
+  .template-form {
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: vars.$spacing-standard;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  h3 {
+    margin-top: vars.$spacing-large;
+    margin-bottom: vars.$spacing-standard;
+    color: vars.$primary-color;
+    font-weight: 500;
+  }
+
+  .question-container {
+    margin-bottom: vars.$spacing-standard;
+  }
+
+  .question-item {
+    display: flex;
+    flex-direction: column;
+    background-color: color.adjust(vars.$primary-color, $alpha: -0.95);
+    padding: vars.$spacing-small;
+    border-radius: vars.$border-radius;
+    margin-bottom: vars.$spacing-xsmall;
+
+    .question-field {
+      width: 100%;
+    }
+
+    .question-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: vars.$spacing-small;
+    }
+  }
+
+  .answer-field {
+    padding: vars.$spacing-small vars.$spacing-standard;
+    background-color: color.adjust(vars.$accent-color, $alpha: -0.95);
+    border-radius: vars.$border-radius;
+    margin-top: vars.$spacing-xsmall;
+
+    textarea {
+      min-height: 80px;
+    }
+  }
+
+  .add-question-btn {
+    margin-top: vars.$spacing-small;
+    margin-bottom: vars.$spacing-standard;
+  }
+
+  mat-card-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: vars.$spacing-standard;
+  }
+
+  @media (max-width: 600px) {
+    .question-item {
+      flex-direction: column;
+    }
+  }
+}

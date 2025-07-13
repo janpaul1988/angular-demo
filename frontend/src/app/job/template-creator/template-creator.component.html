@@ -1,0 +1,101 @@
+<div class="template-creator">
+  <h2>{{ isEditMode ? 'Update' : 'Create' }} Journal Template</h2>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Saving template...</span>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-message">
+      <mat-icon color="warn">error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
+
+  <form [formGroup]="templateForm" (ngSubmit)="onSubmit()">
+    <mat-card class="template-form">
+      <mat-card-header>
+        <mat-card-title>Template Details</mat-card-title>
+        <mat-card-subtitle>
+          {{ isEditMode ? 'Update template version ' + ((originalTemplate?.version ?? 0) + 1) : 'Create a new template' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Template Name</mat-label>
+          <input matInput formControlName="name" placeholder="Weekly progress report">
+          <mat-error *ngIf="templateForm.get('name')?.hasError('required')">
+            Template name is required
+          </mat-error>
+          <mat-error *ngIf="templateForm.get('name')?.hasError('minlength')">
+            Template name must be at least 3 characters
+          </mat-error>
+        </mat-form-field>
+
+        <h3>Questions</h3>
+        <div formArrayName="questions">
+          @for (question of questions.controls; let i = $index; track i) {
+            <div [formGroupName]="i" class="question-container">
+              <div class="question-item">
+                <mat-form-field appearance="outline" class="question-field">
+                  <mat-label>Question {{ i + 1 }}</mat-label>
+                  <input matInput formControlName="label" placeholder="Enter your question">
+                  <mat-error *ngIf="question.get('label')?.hasError('required')">
+                    Question is required
+                  </mat-error>
+                  <mat-error *ngIf="question.get('label')?.hasError('minlength')">
+                    Question must be at least 3 characters
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="question-actions">
+                  <mat-checkbox formControlName="required">Required</mat-checkbox>
+                  <button type="button" mat-icon-button color="warn"
+                          (click)="removeQuestion(i)"
+                          [disabled]="questions.length <= 1"
+                          aria-label="Remove question">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Answer field in edit mode -->
+              @if (isEditMode && journalForm) {
+                <div class="answer-field">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Answer</mat-label>
+                    <textarea matInput
+                              placeholder="Enter your answer"
+                              rows="3"
+                              [value]="getJournalAnswer(question.get('id')?.value || '')"
+                              (input)="onAnswerInput($event, question.get('id')?.value || '')"></textarea>
+                    <mat-error *ngIf="journalForm.get(question.get('id')?.value || '')?.hasError('required')">
+                      Answer is required
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <button type="button" mat-stroked-button color="primary" (click)="addQuestion()" class="add-question-btn">
+          <mat-icon>add</mat-icon>
+          Add Question
+        </button>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button type="button" mat-button (click)="cancel()">CANCEL</button>
+        <button type="submit" mat-raised-button color="primary"
+                [disabled]="templateForm.invalid || (isEditMode && journalForm.invalid)">
+          {{ isEditMode ? 'UPDATE' : 'CREATE' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

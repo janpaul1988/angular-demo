@@ -1,0 +1,180 @@
+@use '../styles' as styles;
+@use '../styles/variables' as vars;
+@use "sass:color";
+
+/* Overall list styling */
+mat-list {
+  padding: vars.$spacing-small 0;
+}
+
+/* Base styles for all jobs */
+.active-job, .inactive-job {
+  margin: vars.$spacing-small 0;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-medium;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: vars.$shadow-elevated;
+    transform: translateY(-2px);
+  }
+}
+
+/* Active job styling */
+.active-job {
+  background-color: vars.$success-light;
+  border-left: 6px solid vars.$success-color;
+  position: relative;
+
+  // Add a green indicator dot for active jobs
+  h4::after {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: vars.$success-color;
+    border-radius: 50%;
+    margin-left: vars.$spacing-small;
+    box-shadow: 0 0 5px rgba(67, 160, 71, 0.5);
+    animation: pulse 2s infinite;
+  }
+
+  // Title styling for active jobs
+  h4[matListItemTitle] {
+    color: color.adjust(vars.$success-color, $lightness: -15%);
+    font-weight: 600;
+  }
+
+  // Date value for active jobs
+  .date-value {
+    color: vars.$success-dark;
+    font-weight: 500;
+  }
+}
+
+/* Animation for the active indicator */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(67, 160, 71, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(67, 160, 71, 0);
+  }
+}
+
+/* Inactive job styling */
+.inactive-job {
+  background-color: vars.$background-light;
+  border-left: 6px solid #bdbdbd;
+  opacity: 0.9;
+}
+
+/* Title styling */
+h4[matListItemTitle] {
+  color: vars.$text-color-primary;
+  font-size: vars.$font-size-medium;
+  margin-bottom: vars.$spacing-xsmall;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+/* Description styling */
+.job-description {
+  color: vars.$text-color-secondary;
+  font-style: italic;
+  margin: 6px 0;
+}
+
+/* Date fields styling */
+.job-dates {
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+}
+
+.date-label {
+  font-weight: 500;
+  color: vars.$text-color-muted;
+  margin-right: vars.$spacing-xsmall;
+  min-width: 45px;
+}
+
+.date-value {
+  color: vars.$text-color-primary;
+}
+
+/* Job actions styling */
+.job-actions {
+  margin-top: vars.$spacing-small;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: vars.$spacing-xsmall;
+}
+
+/* Journal button styling */
+.journal-button {
+  @extend .action-button;
+  margin-left: auto;
+  font-weight: 500;
+  padding: 0 vars.$spacing-standard;
+  height: 36px;
+
+  &:hover {
+    background-color: vars.$primary-dark;
+  }
+}
+
+/* Jobs List Title Styling */
+.jobs-title {
+  text-align: center;
+  margin: vars.$spacing-medium 0;
+  font-size: vars.$font-size-xlarge;
+  font-weight: 500;
+  color: vars.$text-color-primary;
+  padding-bottom: vars.$spacing-small;
+  border-bottom: 2px solid vars.$primary-color;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Fix for Angular Material's list item structure */
+::ng-deep .mat-mdc-list-item-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  padding: vars.$spacing-standard vars.$spacing-large !important;
+  width: 100%;
+}
+
+/* Empty state styling */
+.no-jobs-message {
+  text-align: center;
+  padding: vars.$spacing-large 0;
+  color: vars.$text-color-muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-xsmall;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .job-actions {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .journal-button {
+      margin-left: 0;
+      width: 100%;
+      margin-top: vars.$spacing-xsmall;
+    }
+  }
+}

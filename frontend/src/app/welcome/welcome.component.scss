@@ -1,0 +1,47 @@
+@use '../styles' as styles;
+@use '../styles/variables' as vars;
+
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 80vh;
+
+  .job-container {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding: vars.$spacing-standard;
+    margin: vars.$spacing-small;
+  }
+
+  .vertical-divider {
+    width: 1px;
+    margin: 0 vars.$spacing-small;
+  }
+
+  .add-job-container {
+    @extend .card;
+    padding: vars.$spacing-standard;
+    margin: vars.$spacing-small;
+
+    @media (max-width: 768px) {
+      width: 300px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+
+    .job-container, .add-job-container {
+      width: auto;
+    }
+
+    .vertical-divider {
+      width: auto;
+      height: 1px;
+      margin: vars.$spacing-small 0;
+    }
+  }
+}

@@ -8,8 +8,8 @@ services:
     volumes:
       - mysql:/var/lib/mysql
     # Uncomment these lines to communicate with the database separately
-    ports:
-      - "3306:3306"
+    #    ports:
+    #      - "3306:3306"
     networks:
       - app_network
 
@@ -22,12 +22,7 @@ services:
       OAUTH2_PROXY_CLIENT_ID: "${OAUTH2_PROXY_CLIENT_ID}"
       OAUTH2_PROXY_CLIENT_SECRET: "${OAUTH2_PROXY_CLIENT_SECRET}"
       OAUTH2_PROXY_COOKIE_SECRET: "${OAUTH2_PROXY_COOKIE_SECRET}"
-      #      OAUTH2_PROXY_REVERSE_PROXY: true
-      #      OAUTH2_PROXY_SET_AUTHORIZATION_HEADER: true
-      #      OAUTH2_PROXY_SET_XAUTHREQUEST: true
-      #      OAUTH2_PROXY_COOKIE_SECURE: true
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"
-      #      OAUTH2_PROXY_COOKIE_DOMAIN: "*"
       OAUTH2_PROXY_UPSTREAMS: "http://spring-boot-app:8080/"
       OAUTH2_PROXY_REDIRECT_URL: "http://localhost:80/oauth2/callback"
     depends_on:
@@ -43,8 +38,8 @@ services:
     depends_on:
       - mariadb
     # Uncomment these lines to test the backend separately
-    #    ports:
-    #      - "8080:8080"
+    ports:
+      - "8080:8080"
     networks:
       - app_network
     restart: on-failure

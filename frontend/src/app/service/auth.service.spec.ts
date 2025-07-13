@@ -1,6 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
-import {ProductService} from './product.service';
+import {JobService} from './job.service';
 import {provideHttpClient} from '@angular/common/http';
 import {AuthService} from "./auth.service";
 import {RedirectService} from "./redirect.service";
@@ -16,7 +16,7 @@ describe('AuthService', () => {
     redirectServiceSpy = jasmine.createSpy('redirect');
     TestBed.configureTestingModule({
       providers: [
-        ProductService,
+        JobService,
         provideHttpClient(),
         provideHttpClientTesting(),
         {provide: RedirectService, useValue: {redirect: redirectServiceSpy}}

@@ -1,11 +1,13 @@
 package org.example.angulardemo.dto
 
 import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotNull
 
 data class UserDTO(
-    val id: Long? = null,
+    val id: Long?,
     @field: Email(message = "Email must be valid.")
-    var email: String? = null,
+    @field:NotNull(message = "Email must not be null.")
+    var email: String?,
 )
 
 

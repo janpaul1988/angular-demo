@@ -1,0 +1,120 @@
+@use 'variables' as vars;
+@use "sass:color";
+
+/* ===== GLOBAL LAYOUT STYLES ===== */
+.page-container {
+  max-width: vars.$container-max-width;
+  margin: 0 auto;
+  padding: vars.$spacing-medium;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-subtle;
+  padding: vars.$spacing-large;
+  margin-bottom: vars.$spacing-medium;
+}
+
+/* ===== FORM STYLES ===== */
+.standard-form {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-standard;
+  max-width: vars.$form-max-width;
+  margin: auto;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  // Form elements
+  textarea, input {
+    width: 100%;
+    font-family: inherit;
+  }
+
+  // Form buttons
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: vars.$spacing-large;
+    gap: vars.$spacing-small;
+  }
+
+  // Action button
+  button[type="submit"] {
+    align-self: flex-end;
+
+    mat-icon {
+      margin-right: 6px;
+    }
+  }
+}
+
+// Error message styling
+.error-message {
+  color: vars.$error-color;
+  font-size: vars.$font-size-xsmall;
+  margin-top: vars.$spacing-xsmall;
+}
+
+// Info message styling
+.info-message {
+  background-color: vars.$primary-light;
+  border: 1px solid color.adjust(vars.$primary-color, $lightness: 30%);
+  border-radius: vars.$border-radius;
+  padding: vars.$spacing-standard;
+  margin: vars.$spacing-standard 0;
+  text-align: center;
+
+  p {
+    margin: 0 0 vars.$spacing-small;
+    font-size: vars.$font-size-normal;
+    color: color.adjust(vars.$primary-color, $lightness: -20%);
+  }
+}
+
+// Success message styling
+.success-message {
+  background-color: vars.$success-light;
+  border: 1px solid vars.$success-border;
+  border-radius: vars.$border-radius;
+  padding: vars.$spacing-standard;
+  margin: vars.$spacing-standard 0;
+  text-align: center;
+
+  p {
+    margin: 0 0 vars.$spacing-small;
+    font-size: vars.$font-size-normal;
+    color: vars.$success-dark;
+  }
+}
+
+/* ===== BUTTON STYLES ===== */
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-xsmall;
+  font-weight: 500;
+  padding: 0 vars.$spacing-standard;
+
+  mat-icon {
+    margin-right: vars.$spacing-xsmall;
+  }
+}
+
+/* ===== BUTTON STYLES ===== */
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-xsmall;
+  font-weight: 500;
+  padding: 0 vars.$spacing-standard;
+
+  mat-icon {
+    margin-right: vars.$spacing-xsmall;
+  }
+}
