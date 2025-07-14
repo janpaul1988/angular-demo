@@ -48,6 +48,7 @@ class JournalService(
             .let {
                 var journalToUpdateTo = journalMapper.toEntity(journalDTO);
                 it.content = journalToUpdateTo.content
+                it.templateId = journalToUpdateTo.templateId
                 journalRepository.save(it)
             }.let {
                 journalMapper.toDto(it)

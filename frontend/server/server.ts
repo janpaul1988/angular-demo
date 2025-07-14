@@ -23,7 +23,7 @@ app.route("/api/jobs/:id").delete(deleteJob);
 app.route("/api/journaltemplates/:id").get(getJournalTemplate)
 
 app.route("/api/journaltemplates/user/:userId").get(getJournalTemplates)
-app.route("/api/journaltemplates/").post(saveJournalTemplate)
+app.route("/api/journaltemplates").post(saveJournalTemplate)
 
 app.route("/api/journals").get(getJournalByJobIdYearAndWeek)
 app.route("/api/journals/job/:jobId").get(getJournalsForJobId)

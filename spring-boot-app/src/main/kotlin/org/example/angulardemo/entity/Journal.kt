@@ -8,7 +8,7 @@ data class Journal(
     @Id
     val id: String?,
     val jobId: String,
-    val templateId: String,
+    var templateId: String,
     val year: Int,
     val week: Int,
     var content: String,
