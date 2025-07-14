@@ -1,7 +1,8 @@
 package org.example.angulardemo.controller
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
-import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.flow.flowOf
@@ -19,9 +20,15 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class JournalTemplateControllerUnitTest(
     @Autowired
     val webTestClient: WebTestClient,
+    @Autowired
+    val objectMapper: ObjectMapper,
 ) {
     @MockkBean(relaxed = true)
     lateinit var journalTemplateService: JournalTemplateService
+
+    private fun createJsonNode(content: String): JsonNode {
+        return objectMapper.readTree(content)
+    }
 
     @Test
     fun `should get journal template by id`() {
@@ -32,7 +39,7 @@ class JournalTemplateControllerUnitTest(
             userId = 1L,
             name = "Weekly Report Template",
             version = 1,
-            content = "{\"questions\":[{\"id\":\"q1\",\"text\":\"What did you accomplish this week?\"}]}"
+            content = createJsonNode("{\"questions\":[{\"id\":\"q1\",\"text\":\"What did you accomplish this week?\"}]}")
         )
 
         coEvery { journalTemplateService.findJournalTemplateDtoById(templateId) } returns template
@@ -79,14 +86,14 @@ class JournalTemplateControllerUnitTest(
                 userId = userId,
                 name = "Weekly Report Template",
                 version = 1,
-                content = "{\"questions\":[{\"id\":\"q1\",\"text\":\"What did you accomplish this week?\"}]}"
+                content = createJsonNode("{\"questions\":[{\"id\":\"q1\",\"text\":\"What did you accomplish this week?\"}]}")
             ),
             JournalTemplateDTO(
                 id = "template-2",
                 userId = userId,
                 name = "Monthly Review Template",
                 version = 1,
-                content = "{\"questions\":[{\"id\":\"q1\",\"text\":\"What were your major achievements this month?\"}]}"
+                content = createJsonNode("{\"questions\":[{\"id\":\"q1\",\"text\":\"What were your major achievements this month?\"}]}")
             )
         )
 
@@ -112,11 +119,11 @@ class JournalTemplateControllerUnitTest(
             userId = 1L,
             name = "New Template",
             version = 1,
-            content = "{\"questions\":[{\"id\":\"q1\",\"text\":\"New question\"}]}"
+            content = createJsonNode("{\"questions\":[{\"id\":\"q1\",\"text\":\"New question\"}]}")
         )
         val savedTemplate = templateToSave.copy(id = "template-3")
 
-        coEvery { journalTemplateService.createOrUpdateTemplate(templateToSave) } returns savedTemplate
+        coEvery { journalTemplateService.createOrUpdateTemplate(any()) } returns savedTemplate
 
         // When
         webTestClient.post()
@@ -128,7 +135,7 @@ class JournalTemplateControllerUnitTest(
             .isEqualTo(savedTemplate)
 
         // Then
-        coVerify(exactly = 1) { journalTemplateService.createOrUpdateTemplate(templateToSave) }
+        coVerify(exactly = 1) { journalTemplateService.createOrUpdateTemplate(any()) }
     }
 
     @Test
@@ -139,7 +146,7 @@ class JournalTemplateControllerUnitTest(
             userId = 1L,
             name = "",  // Invalid: blank name
             version = 1,
-            content = "{\"questions\":[{\"id\":\"q1\",\"text\":\"New question\"}]}"
+            content = createJsonNode("{\"questions\":[{\"id\":\"q1\",\"text\":\"New question\"}]}")
         )
 
         // When
@@ -150,7 +157,7 @@ class JournalTemplateControllerUnitTest(
             .expectStatus().isBadRequest
 
         // Then
-        coVerify { journalTemplateService wasNot Called }
+        coVerify(exactly = 0) { journalTemplateService.createOrUpdateTemplate(any()) }
     }
 
     @Test

@@ -186,6 +186,10 @@ export class JobJournalComponent implements OnInit {
         }),
         catchError(error => {
           console.log('No journal found, loading default template from job');
+          // Reset current journal and form
+          this.currentJournal = undefined;
+          this.resetForm();
+
           // If journal doesn't exist, load the template from the job
           if (this.job.currentJournalTemplateId) {
             return this.templateService.findJournalTemplateById(this.job.currentJournalTemplateId);

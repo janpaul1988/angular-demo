@@ -2,6 +2,7 @@ package org.example.angulardemo.service
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.RelaxedMockK
@@ -36,11 +37,14 @@ class JournalTemplateServiceUnitTest(
     @InjectMockKs
     private val journalTemplateService: JournalTemplateService,
 ) {
+    private lateinit var objectMapper: ObjectMapper
 
     @BeforeTest()
-    fun setUpLogging() {
+    fun setup() {
         val logger = LoggerFactory.getLogger("org.example.angulardemo") as Logger
         logger.level = Level.DEBUG
+
+        objectMapper = ObjectMapper()
     }
 
     @Test
@@ -59,7 +63,7 @@ class JournalTemplateServiceUnitTest(
             userId = 1L,
             name = "Template 1",
             version = 1,
-            content = "{\"questions\": []}"
+            content = objectMapper.readTree("{\"questions\": []}")
         )
 
         coEvery { journalTemplateRepositoryMockk.findById(templateId) } returns template
@@ -115,14 +119,14 @@ class JournalTemplateServiceUnitTest(
                 userId = userId,
                 name = "Template 1",
                 version = 1,
-                content = "{\"questions\": []}"
+                content = objectMapper.readTree("{\"questions\": []}")
             ),
             JournalTemplateDTO(
                 id = "template-2",
                 userId = userId,
                 name = "Template 2",
                 version = 1,
-                content = "{\"questions\": []}"
+                content = objectMapper.readTree("{\"questions\": []}")
             )
         )
 
@@ -143,8 +147,6 @@ class JournalTemplateServiceUnitTest(
         assertEquals(templatesDTO, result)
     }
 
-    // Note: Test disabled due to complexity of mocking reactive transactions
-    @org.junit.jupiter.api.Disabled("Test skipped due to transaction mocking complexity")
     @Test
     fun `should create new journal template`() = runTest {
         // Given
@@ -155,7 +157,7 @@ class JournalTemplateServiceUnitTest(
             userId = userId,
             name = templateName,
             version = 1,
-            content = "{\"questions\": []}"
+            content = objectMapper.readTree("{\"questions\": []}")
         )
 
         val template = JournalTemplate(
@@ -166,7 +168,8 @@ class JournalTemplateServiceUnitTest(
             content = "{\"questions\": []}"
         )
 
-        val savedTemplate = template.copy(id = "template-3", version = 1)
+        val templateWithIncVersion = template.copy(version = 1) // First version
+        val savedTemplate = templateWithIncVersion.copy(id = "template-3")
         val savedTemplateDTO = templateDTO.copy(id = "template-3", version = 1)
 
         every { journalTemplateMapperMockk.toEntity(templateDTO) } returns template
@@ -175,24 +178,18 @@ class JournalTemplateServiceUnitTest(
         coEvery { journalTemplateRepositoryMockk.save(any()) } returns savedTemplate
         every { journalTemplateMapperMockk.toDto(savedTemplate) } returns savedTemplateDTO
 
-        // Mock the transactional operation - this is a simplification for testing purposes only
-        val service = spyk(journalTemplateService)
-        coEvery { service.createOrUpdateTemplate(any()) } answers {
-            savedTemplateDTO
-        }
-
         // When
-        val result = service.createOrUpdateTemplate(templateDTO)
+        val result = journalTemplateService.createOrUpdateTemplate(templateDTO)
 
         // Then
         assertEquals(savedTemplateDTO, result)
         verify(exactly = 1) { journalTemplateMapperMockk.toEntity(templateDTO) }
         coVerify(exactly = 1) { userServiceMockk.doesUserExist(userId) }
         coVerify(exactly = 1) { journalTemplateRepositoryMockk.findMaxVersionByUserIdAndName(userId, templateName) }
+        coVerify(exactly = 1) { journalTemplateRepositoryMockk.save(any()) }
+        verify(exactly = 1) { journalTemplateMapperMockk.toDto(savedTemplate) }
     }
 
-    // Note: Test disabled due to complexity of mocking reactive transactions
-    @org.junit.jupiter.api.Disabled("Test skipped due to transaction mocking complexity")
     @Test
     fun `should update existing journal template with incremented version`() = runTest {
         // Given
@@ -203,7 +200,7 @@ class JournalTemplateServiceUnitTest(
             userId = userId,
             name = templateName,
             version = 1,
-            content = "{\"questions\": []}"
+            content = objectMapper.readTree("{\"questions\": []}")
         )
 
         val template = JournalTemplate(
@@ -214,7 +211,8 @@ class JournalTemplateServiceUnitTest(
             content = "{\"questions\": []}"
         )
 
-        val savedTemplate = template.copy(id = "template-4", version = 2)
+        val templateWithIncVersion = template.copy(version = 2) // Incremented version
+        val savedTemplate = templateWithIncVersion.copy(id = "template-4")
         val savedTemplateDTO = templateDTO.copy(id = "template-4", version = 2)
 
         every { journalTemplateMapperMockk.toEntity(templateDTO) } returns template
@@ -223,20 +221,16 @@ class JournalTemplateServiceUnitTest(
         coEvery { journalTemplateRepositoryMockk.save(any()) } returns savedTemplate
         every { journalTemplateMapperMockk.toDto(savedTemplate) } returns savedTemplateDTO
 
-        // Skip testing the transactional part - we'll just verify the transformations
-        val service = spyk(journalTemplateService)
-        coEvery { service.createOrUpdateTemplate(any()) } answers {
-            savedTemplateDTO
-        }
-
         // When
-        val result = service.createOrUpdateTemplate(templateDTO)
+        val result = journalTemplateService.createOrUpdateTemplate(templateDTO)
 
         // Then
         assertEquals(savedTemplateDTO, result)
         verify(exactly = 1) { journalTemplateMapperMockk.toEntity(templateDTO) }
         coVerify(exactly = 1) { userServiceMockk.doesUserExist(userId) }
         coVerify(exactly = 1) { journalTemplateRepositoryMockk.findMaxVersionByUserIdAndName(userId, templateName) }
+        coVerify(exactly = 1) { journalTemplateRepositoryMockk.save(any()) }
+        verify(exactly = 1) { journalTemplateMapperMockk.toDto(savedTemplate) }
     }
 
     @Test

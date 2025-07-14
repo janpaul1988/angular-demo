@@ -1,5 +1,6 @@
 package org.example.angulardemo.dto
 
+import com.fasterxml.jackson.databind.JsonNode
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
@@ -10,6 +11,6 @@ data class JournalTemplateDTO(
     @field:NotBlank(message = "name cannot be blank.")
     val name: String?,
     val version: Int?,
-    @field: NotBlank(message = "content cannot be blank.")
-    val content: String?,
+    @field: NotNull(message = "content cannot be null.")
+    val content: JsonNode,
 )

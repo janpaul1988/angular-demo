@@ -3,8 +3,6 @@ package org.example.angulardemo.service
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.reactor.mono
 import org.example.angulardemo.dto.JournalTemplateDTO
 import org.example.angulardemo.entity.JournalTemplate
 import org.example.angulardemo.exception.JournalTemplateNotFoundException
@@ -35,29 +33,25 @@ class JournalTemplateService(
     }
 
     suspend fun createOrUpdateTemplate(journalTemplateDTO: JournalTemplateDTO): JournalTemplateDTO {
-        var journalTemplate = journalTemplateMapper.toEntity(journalTemplateDTO)
+        val journalTemplate = journalTemplateMapper.toEntity(journalTemplateDTO)
+
+        // First check if user exists
         userService.doesUserExist(journalTemplate.userId)
 
-        return transactionalOperator.execute { _ ->
-            mono {
-                // Find the max version for templates with this name and userId
-                val maxVersion = journalTemplateRepository.findMaxVersionByUserIdAndName(
-                    journalTemplate.userId,
-                    journalTemplate.name
-                ) ?: 0
+        // Get max version (handling null case)
+        val maxVersion = journalTemplateRepository.findMaxVersionByUserIdAndName(
+            journalTemplate.userId,
+            journalTemplate.name
+        ) ?: 0
 
-                // Set the new version (increment by 1)
-                journalTemplate.version = maxVersion + 1
-                
-                // Save the template with the new version
-                val savedTemplate = journalTemplateRepository.save(journalTemplate)
+        // Set the incremented version
+        journalTemplate.version = maxVersion + 1
 
-                // Return the saved template
-                savedTemplate
-            }
-        }.awaitSingle().let {
-            journalTemplateMapper.toDto(it)
-        }
+        // Save with the new version
+        val savedTemplate = journalTemplateRepository.save(journalTemplate)
+
+        // Convert to DTO and return
+        return journalTemplateMapper.toDto(savedTemplate)
     }
 
     suspend fun deleteJournalTemplate(journalTemplateId: String): Any {

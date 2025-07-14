@@ -1,11 +1,12 @@
 package org.example.angulardemo.mapper
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.example.angulardemo.dto.JournalDTO
 import org.example.angulardemo.entity.Journal
 import org.springframework.stereotype.Component
 
 @Component
-class JournalMapper {
+class JournalMapper(private val objectMapper: ObjectMapper) {
 
     fun toEntity(journalDTO: JournalDTO): Journal {
         return Journal(
@@ -14,7 +15,7 @@ class JournalMapper {
             templateId = journalDTO.templateId!!,
             year = journalDTO.year!!,
             week = journalDTO.week,
-            content = journalDTO.content,
+            content = objectMapper.writeValueAsString(journalDTO.content),
         )
     }
 
@@ -25,7 +26,7 @@ class JournalMapper {
             templateId = journal.templateId,
             year = journal.year,
             week = journal.week,
-            content = journal.content,
+            content = objectMapper.readTree(journal.content),
         )
     }
 

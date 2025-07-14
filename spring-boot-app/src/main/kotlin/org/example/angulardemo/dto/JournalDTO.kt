@@ -1,5 +1,6 @@
 package org.example.angulardemo.dto
 
+import com.fasterxml.jackson.databind.JsonNode
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
@@ -17,7 +18,6 @@ data class JournalDTO(
     @field:Min(value = 1, message = "week must be equal to or higher then 1.")
     @field:Max(value = 53, message = "week must be equal to or lower then 53.")
     val week: Int,
-    @field:NotNull(message = "description cannot be blank.")
-    val content: String,
-
+    @field:NotNull(message = "content cannot be null.")
+    val content: JsonNode,
     )

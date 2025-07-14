@@ -3,7 +3,6 @@ import {getTestJournalByYearWeekAndJobId, getTestJournalsForJobId, saveTestJourn
 import {Journal} from "../src/app/shared/journal";
 
 export function getJournalByJobIdYearAndWeek(req: Request, res: Response) {
-  console.log("are we ever here?")
   const jobId = req.query["jobId"]?.toString()!!,
     week = +req.query["week"]?.toString()!!,
     year = +req.query["year"]?.toString()!!;
