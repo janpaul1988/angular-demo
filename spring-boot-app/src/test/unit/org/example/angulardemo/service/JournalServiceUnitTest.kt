@@ -2,6 +2,7 @@ package org.example.angulardemo.service
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.RelaxedMockK
@@ -33,11 +34,14 @@ class JournalServiceUnitTest(
     @InjectMockKs
     private val journalService: JournalService,
 ) {
-
+    private lateinit var objectMapper: ObjectMapper
+    
     @BeforeTest()
-    fun setUpLogging() {
+    fun setup() {
         val logger = LoggerFactory.getLogger("org.example.angulardemo") as Logger
         logger.level = Level.DEBUG
+
+        objectMapper = ObjectMapper()
     }
 
     @Test
@@ -62,7 +66,7 @@ class JournalServiceUnitTest(
             templateId = "template-1",
             year = year,
             week = week,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Test answer\"}]}"
+            content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Test answer\"}]}")
         )
 
         coEvery { journalRepositoryMockk.findByYearAndWeekAndJobId(year, week, jobId) } returns journal
@@ -126,7 +130,7 @@ class JournalServiceUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 25,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 25 answer\"}]}"
+            content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 25 answer\"}]}")
         )
 
         val journalDTO2 = JournalDTO(
@@ -135,7 +139,7 @@ class JournalServiceUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 26,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 26 answer\"}]}"
+            content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 26 answer\"}]}")
         )
 
         coEvery { journalRepositoryMockk.findByJobId(jobId) } returns journalFlow
@@ -161,7 +165,7 @@ class JournalServiceUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 27,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New answer\"}]}"
+            content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New answer\"}]}")
         )
 
         val journal = Journal(
@@ -203,7 +207,7 @@ class JournalServiceUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 25,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}"
+            content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}")
         )
 
         val existingJournal = Journal(
@@ -254,7 +258,7 @@ class JournalServiceUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 25,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Some answer\"}]}"
+            content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Some answer\"}]}")
         )
 
         coEvery { journalRepositoryMockk.findById(journalId) } returns null

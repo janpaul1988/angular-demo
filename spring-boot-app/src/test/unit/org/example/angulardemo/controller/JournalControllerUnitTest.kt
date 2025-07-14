@@ -1,5 +1,7 @@
 package org.example.angulardemo.controller
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.Called
 import io.mockk.coEvery
@@ -19,9 +21,15 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class JournalControllerUnitTest(
     @Autowired
     val webTestClient: WebTestClient,
+    @Autowired
+    val objectMapper: ObjectMapper,
 ) {
     @MockkBean(relaxed = true)
     lateinit var journalService: JournalService
+
+    private fun createJsonNode(content: String): JsonNode {
+        return objectMapper.readTree(content)
+    }
 
     @Test
     fun `should get journal by year, week and job id`() {
@@ -35,7 +43,7 @@ class JournalControllerUnitTest(
             templateId = "template-1",
             year = year,
             week = week,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Test answer\"}]}"
+            content = createJsonNode("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Test answer\"}]}")
         )
 
         coEvery { journalService.getJournalByYearWeekAndJobId(year, week, jobId) } returns journal
@@ -97,7 +105,7 @@ class JournalControllerUnitTest(
                 templateId = "template-1",
                 year = 2025,
                 week = 25,
-                content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 25 answer\"}]}"
+                content = createJsonNode("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 25 answer\"}]}")
             ),
             JournalDTO(
                 id = "journal-2",
@@ -105,7 +113,7 @@ class JournalControllerUnitTest(
                 templateId = "template-1",
                 year = 2025,
                 week = 26,
-                content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 26 answer\"}]}"
+                content = createJsonNode("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Week 26 answer\"}]}")
             )
         )
 
@@ -132,7 +140,7 @@ class JournalControllerUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 27,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New answer\"}]}"
+            content = createJsonNode("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New answer\"}]}")
         )
         val savedJournal = journalToSave.copy(id = "journal-3")
 
@@ -160,7 +168,7 @@ class JournalControllerUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 27,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New answer\"}]}"
+            content = createJsonNode("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New answer\"}]}")
         )
 
         // When
@@ -183,7 +191,7 @@ class JournalControllerUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 25,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}"
+            content = createJsonNode("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}")
         )
         val updatedJournal = journalToUpdate.copy()
 
@@ -211,7 +219,7 @@ class JournalControllerUnitTest(
             templateId = "template-1",
             year = 2025,
             week = 25,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Some answer\"}]}"
+            content = createJsonNode("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Some answer\"}]}")
         )
 
         coEvery { journalService.updateJournal(nonExistingJournal) } throws JournalNotFoundException(nonExistingJournal.id!!)

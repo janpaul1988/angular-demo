@@ -1,5 +1,7 @@
 package org.example.angulardemo.controller
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -27,6 +29,7 @@ import java.time.LocalDate
 import kotlin.test.BeforeTest
 import kotlin.test.assertNull
 
+//
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
@@ -38,6 +41,7 @@ class JournalControllerIntegrationTest(
     @Autowired private val userCrudRepository: UserCrudRepository,
     @Autowired val journalMapper: JournalMapper,
     @Autowired private val databaseCleanupUtil: DatabaseCleanupUtil,
+    @Autowired private val objectMapper: ObjectMapper,
 ) {
     private lateinit var userId: String
     private lateinit var jobId: String
@@ -46,6 +50,10 @@ class JournalControllerIntegrationTest(
     private val week = 25
     private val journalContent = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Test answer\"}]}"
     private val templateContent = "{\"questions\":[{\"id\":\"q1\",\"text\":\"What did you accomplish this week?\"}]}"
+
+    private fun createJsonNode(content: String): JsonNode {
+        return objectMapper.readTree(content)
+    }
 
     @BeforeTest
     fun setup() = runBlocking {
@@ -177,7 +185,7 @@ class JournalControllerIntegrationTest(
             templateId = templateId,
             year = year,
             week = week + 2,
-            content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New journal entry\"}]}"
+            content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"New journal entry\"}]}")
         )
 
         // When/Then: Verify POST request creates and returns the journal
@@ -200,7 +208,7 @@ class JournalControllerIntegrationTest(
                 runBlocking {
                     val dbJournal = journalRepository.findById(savedJournal.id!!)
                     assertThat(dbJournal).isNotNull
-                    assertThat(dbJournal?.content).isEqualTo(newJournal.content)
+                    assertThat(dbJournal?.content).isEqualTo(objectMapper.writeValueAsString(newJournal.content))
                 }
             }
     }
@@ -226,7 +234,8 @@ class JournalControllerIntegrationTest(
         assertThat(initialJournal?.content).contains("Original answer")
 
         // Prepare update data
-        val updatedContent = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}"
+        val updatedContent =
+            objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}");
         val updatedJournal = JournalDTO(
             id = journalId,
             jobId = jobId,
@@ -252,7 +261,7 @@ class JournalControllerIntegrationTest(
         // Verify the database was updated
         val dbJournal = runBlocking { journalRepository.findById(journalId) }
         assertThat(dbJournal).isNotNull
-        assertThat(dbJournal?.content).isEqualTo(updatedContent)
+        assertThat(dbJournal?.content).isEqualTo(objectMapper.writeValueAsString(updatedContent))
     }
 
     @Test

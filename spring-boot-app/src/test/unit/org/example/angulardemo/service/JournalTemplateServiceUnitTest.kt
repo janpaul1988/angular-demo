@@ -2,6 +2,7 @@ package org.example.angulardemo.service
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.RelaxedMockK
@@ -36,11 +37,14 @@ class JournalTemplateServiceUnitTest(
     @InjectMockKs
     private val journalTemplateService: JournalTemplateService,
 ) {
+    private lateinit var objectMapper: ObjectMapper
 
     @BeforeTest()
-    fun setUpLogging() {
+    fun setup() {
         val logger = LoggerFactory.getLogger("org.example.angulardemo") as Logger
         logger.level = Level.DEBUG
+
+        objectMapper = ObjectMapper()
     }
 
     @Test
@@ -59,7 +63,7 @@ class JournalTemplateServiceUnitTest(
             userId = 1L,
             name = "Template 1",
             version = 1,
-            content = "{\"questions\": []}"
+            content = objectMapper.readTree("{\"questions\": []}")
         )
 
         coEvery { journalTemplateRepositoryMockk.findById(templateId) } returns template
@@ -115,14 +119,14 @@ class JournalTemplateServiceUnitTest(
                 userId = userId,
                 name = "Template 1",
                 version = 1,
-                content = "{\"questions\": []}"
+                content = objectMapper.readTree("{\"questions\": []}")
             ),
             JournalTemplateDTO(
                 id = "template-2",
                 userId = userId,
                 name = "Template 2",
                 version = 1,
-                content = "{\"questions\": []}"
+                content = objectMapper.readTree("{\"questions\": []}")
             )
         )
 
@@ -155,7 +159,7 @@ class JournalTemplateServiceUnitTest(
             userId = userId,
             name = templateName,
             version = 1,
-            content = "{\"questions\": []}"
+            content = objectMapper.readTree("{\"questions\": []}")
         )
 
         val template = JournalTemplate(
@@ -203,7 +207,7 @@ class JournalTemplateServiceUnitTest(
             userId = userId,
             name = templateName,
             version = 1,
-            content = "{\"questions\": []}"
+            content = objectMapper.readTree("{\"questions\": []}")
         )
 
         val template = JournalTemplate(

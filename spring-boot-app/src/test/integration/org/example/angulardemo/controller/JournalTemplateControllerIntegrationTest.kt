@@ -1,5 +1,6 @@
 package org.example.angulardemo.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -31,6 +32,7 @@ class JournalTemplateControllerIntegrationTest(
     @Autowired private val userCrudRepository: UserCrudRepository,
     @Autowired val templateMapper: JournalTemplateMapper,
     @Autowired private val databaseCleanupUtil: DatabaseCleanupUtil,
+    @Autowired val objectMapper: ObjectMapper,
 ) {
     private var userId: Long = 0L
     private val templateContent = "{\"questions\":[{\"id\":\"q1\",\"text\":\"What did you accomplish this week?\"}]}"
@@ -122,7 +124,7 @@ class JournalTemplateControllerIntegrationTest(
             userId = userId,
             name = "New Test Template ${System.currentTimeMillis()}", // Ensure unique name
             version = 1,
-            content = "{\"questions\":[{\"id\":\"q1\",\"text\":\"New test question\"}]}"
+            content = objectMapper.readTree("{\"questions\":[{\"id\":\"q1\",\"text\":\"New test question\"}]}")
         )
 
         // When/Then: Verify POST request creates and returns the template
@@ -144,7 +146,7 @@ class JournalTemplateControllerIntegrationTest(
                 runBlocking {
                     val dbTemplate = templateRepository.findById(savedTemplate.id!!)
                     assertThat(dbTemplate).isNotNull
-                    assertThat(dbTemplate?.content).isEqualTo(newTemplate.content)
+                    assertThat(dbTemplate?.content).isEqualTo(objectMapper.writeValueAsString(newTemplate.content))
                 }
             }
     }
@@ -189,7 +191,7 @@ class JournalTemplateControllerIntegrationTest(
             userId = savedTemplate.userId,
             name = savedTemplate.name, // Same name
             version = savedTemplate.version, // We now send a journal with a version, the backend should recognize this and increment it.
-            content = "{\"questions\":[{\"id\":\"q1\",\"text\":\"Updated question\"}]}"
+            content = objectMapper.readTree("{\"questions\":[{\"id\":\"q1\",\"text\":\"Updated question\"}]}")
         )
 
         // When/Then: Verify POST creates a new version
