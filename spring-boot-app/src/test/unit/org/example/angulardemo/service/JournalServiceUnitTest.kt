@@ -197,14 +197,16 @@ class JournalServiceUnitTest(
     }
 
     @Test
-    fun `should update journal`() = runTest {
+    fun `should update journal with new templateId`() = runTest {
         // Given
         val journalId = "journal-1"
+        val oldTemplateId = "template-1"
+        val newTemplateId = "template-2"
 
         val journalDTO = JournalDTO(
             id = journalId,
             jobId = "job-123",
-            templateId = "template-1",
+            templateId = newTemplateId, // New template ID
             year = 2025,
             week = 25,
             content = objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}")
@@ -213,7 +215,7 @@ class JournalServiceUnitTest(
         val existingJournal = Journal(
             id = journalId,
             jobId = "job-123",
-            templateId = "template-1",
+            templateId = oldTemplateId, // Old template ID
             year = 2025,
             week = 25,
             content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Original answer\"}]}"
@@ -222,13 +224,18 @@ class JournalServiceUnitTest(
         val journalToUpdate = Journal(
             id = journalId,
             jobId = "job-123",
-            templateId = "template-1",
+            templateId = newTemplateId, // New template ID
             year = 2025,
             week = 25,
             content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}"
         )
 
-        val updatedJournal = existingJournal.copy(content = journalToUpdate.content)
+        // Journal after update should have both new content and new template ID
+        val updatedJournal = existingJournal.copy(
+            content = journalToUpdate.content,
+            templateId = newTemplateId
+        )
+        
         val updatedJournalDTO = journalDTO.copy()
 
         coEvery { journalRepositoryMockk.findById(journalId) } returns existingJournal
@@ -244,7 +251,10 @@ class JournalServiceUnitTest(
         verify(exactly = 1) { journalMapperMockk.toEntity(journalDTO) }
         coVerify(exactly = 1) { journalRepositoryMockk.save(any()) }
         verify(exactly = 1) { journalMapperMockk.toDto(updatedJournal) }
+
+        // Verify that both content and templateId are updated
         assertEquals(updatedJournalDTO, result)
+        assertEquals(newTemplateId, result.templateId) // Verify templateId is updated
     }
 
     @Test

@@ -214,14 +214,26 @@ class JournalControllerIntegrationTest(
     }
 
     @Test
-    fun `should update journal successfully`() = runTest {
+    fun `should update journal with new templateId`() = runTest {
+        // First, create another template to switch to
+        val newTemplate = templateRepository.save(
+            JournalTemplate(
+                id = null,
+                userId = userCrudRepository.findById(userId.toLong())!!.id!!,
+                name = "Another Template",
+                version = 1,
+                content = "{\"questions\":[{\"id\":\"q2\",\"text\":\"What are your goals for next week?\"}]}"
+            )
+        )
+        val newTemplateId = newTemplate.id!!
+        
         // Given: Create a journal to update
         val journal = Journal(
             id = null,
             jobId = jobId,
-            templateId = templateId,
+            templateId = templateId, // Original template ID
             year = year,
-            week = week + 3,
+            week = week + 10, // Use a different week
             content = "{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Original answer\"}]}"
         )
 
@@ -232,16 +244,17 @@ class JournalControllerIntegrationTest(
         val initialJournal = runBlocking { journalRepository.findById(journalId) }
         assertThat(initialJournal).isNotNull
         assertThat(initialJournal?.content).contains("Original answer")
+        assertThat(initialJournal?.templateId).isEqualTo(templateId)
 
-        // Prepare update data
+        // Prepare update data with new template ID
         val updatedContent =
-            objectMapper.readTree("{\"answers\":[{\"questionId\":\"q1\",\"answer\":\"Updated answer\"}]}");
+            objectMapper.readTree("{\"answers\":[{\"questionId\":\"q2\",\"answer\":\"Updated answer for new template\"}]}");
         val updatedJournal = JournalDTO(
             id = journalId,
             jobId = jobId,
-            templateId = templateId,
+            templateId = newTemplateId, // New template ID
             year = year,
-            week = week + 3,
+            week = week + 10,
             content = updatedContent
         )
 
@@ -255,12 +268,14 @@ class JournalControllerIntegrationTest(
             .consumeWith { response ->
                 val result = response.responseBody!!
                 assertThat(result.id).isEqualTo(updatedJournal.id)
+                assertThat(result.templateId).isEqualTo(newTemplateId) // Verify template ID is updated
                 assertThat(result.content).isEqualTo(updatedContent)
             }
 
         // Verify the database was updated
         val dbJournal = runBlocking { journalRepository.findById(journalId) }
         assertThat(dbJournal).isNotNull
+        assertThat(dbJournal?.templateId).isEqualTo(newTemplateId) // Verify template ID is updated in DB
         assertThat(dbJournal?.content).isEqualTo(objectMapper.writeValueAsString(updatedContent))
     }
 
