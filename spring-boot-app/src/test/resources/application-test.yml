@@ -1,11 +1,11 @@
 spring:
   r2dbc:
-    url: r2dbc:tc:mariadb:///demo?TC_IMAGE_TAG=11.7.2
+    url: r2dbc:tc:mariadb:///job_journaler?TC_IMAGE_TAG=11.7.2
   sql:
     init:
       mode: always # Always initialize the database on startup
 logging:
   level:
-    org.example.angulardemo: debug
+    org.example.jobjournaler: debug
 
 

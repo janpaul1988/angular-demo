@@ -1,3 +1,3 @@
-rootProject.name = 'angular-demo'
+rootProject.name = 'job-journaler'
 include 'spring-boot-app'
 include 'frontend'

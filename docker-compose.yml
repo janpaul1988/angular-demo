@@ -4,7 +4,7 @@ services:
     container_name: mariadb
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=demo
+      - MYSQL_DATABASE=job_journaler
     volumes:
       - mysql:/var/lib/mysql
     # Uncomment these lines to communicate with the database separately
