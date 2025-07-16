@@ -1,12 +1,12 @@
 spring:
   application:
-    name: angular-demo
+    name: job-journaler
 
   r2dbc:
-    name: demo
+    name: job_journaler
     password: root
     username: root
-    url: r2dbc:mariadb://mariadb:3306/demo
+    url: r2dbc:mariadb://mariadb:3306/job_journaler
 
   sql:
     init:
@@ -14,7 +14,7 @@ spring:
 
 logging:
   level:
-    org.example.angulardemo: debug
+    org.example.jobjournaler: debug
 
 management:
   endpoints:

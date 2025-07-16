@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "demo": {
+    "job-journaler": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/demo",
+            "outputPath": "dist/job-journaler",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,11 +64,11 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "demo:build:production"
+              "buildTarget": "job-journaler:build:production"
             },
             "development": {
               "proxyConfig": "proxy.conf.json",
-              "buildTarget": "demo:build:development"
+              "buildTarget": "job-journaler:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
           "options": {
-            "buildTarget": "demo:build"
+            "buildTarget": "job-journaler:build"
           }
         },
         "test": {
